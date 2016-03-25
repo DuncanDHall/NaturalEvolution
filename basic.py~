@@ -131,8 +131,8 @@ class Blob(object):
 
             model.blobs.remove(self)
 
-        if self.intersect(food):
-                self.food_eaten +=1
+        # if self.intersect(food):
+        #         self.food_eaten +=1
 
         self.change_vel()
 

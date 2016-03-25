@@ -6,6 +6,7 @@ from random import choice
 import numpy as np
 
 screen_size = (500, 500)
+sim_num = 0
 class PyGameBrickView(object):
     """ Provides a view of the brick breaker model in a pygame
         window """
@@ -19,7 +20,13 @@ class PyGameBrickView(object):
         """ Draw the game to the pygame window """
         # draw all the bricks to the screen
         self.screen.fill(pygame.Color('black'))
+
         screen_size = self.screen.get_size()
+
+        basicfont = pygame.font.SysFont(None, 48)
+        sim_num_string = basicfont.render(str(sim_num), True, (255, 255, 255))
+        self.screen.blit(sim_num_string, (1,1))
+
         for blob in self.model.blobs:
             
             if blob.alive:
@@ -51,7 +58,7 @@ class Model(object):
         self.foods = []
         self.DNAresults = []
         #create blobs
-        for i in range(0, 100):
+        for i in range(0, 10):
             x = random.randint(0, 500)
             y = random.randint(0, 500)
             matrix = np.random.uniform(-0.0001,0.0001,(2,6))
@@ -74,13 +81,15 @@ class Model(object):
             #print top_two
             average_dna = (1/2.) * np.add(top_two[0][0], top_two[1][0])
             
-            for i in range(0, 100):
+            for i in range(0, 10):
                 x = random.randint(0, 500)
                 y = random.randint(0, 500)
                 mutation = (1/100.) * random.randint(85, 115)
                 mutated_dna = average_dna * mutation
                 self.blobs.append(Blob(x, y, 10, mutated_dna))
             self.DNAresults = []
+            global sim_num
+            sim_num+=1
 
 
 class Blob(object):
@@ -123,7 +132,7 @@ class Blob(object):
         # if self.center_y>screen_size[1]:
         #     self.center_y=int(screen_size[1])
 
-        self.energy -= .1
+        self.energy -= .3
         if self.energy < 0:
             self.alive=False
             self.score_int = self.score(model)
@@ -131,12 +140,21 @@ class Blob(object):
 
             model.blobs.remove(self)
 
-        # if self.intersect(food):
-        #         self.food_eaten +=1
+        for i in range(len(model.foods)-1, -1, -1):
+            food = model.foods[i]
+            if self.intersect(food):
+                self.food_eaten +=1
+
+                model.foods.remove(food)
+
+                x = random.randint(0, 500)
+                y = random.randint(0, 500)
+                radius = random.randint(5, 10)
+                model.foods.append(Food(x, y, radius))
 
         self.change_vel()
 
-    def change_vel(self):
+    def change_vel(self): 
         target_food = model.foods[0]
         positions = np.array([
             self.center_x, self.center_y, 
