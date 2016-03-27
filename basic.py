@@ -120,7 +120,7 @@ class Model(object):
             if random.random()<.6: #mutation chance for altering a gene
                 mutation = (random.random()-.5)*2*(10**-7)
                 mutated_dna[random.randrange(average_dna.shape[0])][random.randrange(average_dna.shape[1])] += mutation
-            elif random.random()<.05: #mutation chance for replacing a gene
+            elif random.random()<0.4: #mutation chance for replacing a gene
                 mutation = (random.random()-.5)*2*(10**-5)
                 mutated_dna[random.randrange(average_dna.shape[0])][random.randrange(average_dna.shape[1])] = mutation
             self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
@@ -176,7 +176,7 @@ class Blob(object):
         # if self.center_y>screen_size[1]:
         #     self.center_y=int(screen_size[1])
 
-        self.energy -= .1
+        self.energy -= .01
         if self.energy < 0:
             self.alive=False
             self.score_int = self.score()
@@ -201,6 +201,7 @@ class Blob(object):
     def change_vel(self, printvel = False): 
         positions = np.array([
             self.center_x, self.center_y,
+            # self.velocity_x, self.velocity_y, # change matrix dimensions in model init and update
             self.target.center_x, self.target.center_y])
         acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
 
