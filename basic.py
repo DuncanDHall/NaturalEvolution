@@ -89,6 +89,8 @@ class Model(object):
                 self.blobs.append(Blob(x, y, 10, mutated_dna))
             self.DNAresults = []
             global sim_num
+            if sim_num % 10 == 0:
+                print 'generation {} complete'.format(sim_num)
             sim_num+=1
 
 
@@ -173,7 +175,7 @@ class Blob(object):
       
     def score(self, model):
         for food in model.foods:
-            return (self.food_eaten) + 1.0/(1 + np.hypot(
+            return 1.0/(1 + np.hypot(
                 food.center_x-self.center_x, 
                 food.center_y-self.center_y))
             # if intersect(self, food):
@@ -233,6 +235,7 @@ if __name__ == '__main__':
                 if not controller.handle_event(event):
                     running = False
         model.update()
-        view.draw()
-        time.sleep(.01)
+        if sim_num > 1000:
+            view.draw()
+            time.sleep(0.01)
 
