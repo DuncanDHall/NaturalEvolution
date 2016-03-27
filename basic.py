@@ -120,10 +120,10 @@ class Model(object):
             if random.random()<.6: #mutation chance for altering a gene
                 mutation = (random.random()-.5)*2*(10**-7)
                 mutated_dna[random.randrange(average_dna.shape[0])][random.randrange(average_dna.shape[1])] += mutation
-            elif random.random()<.6: #mutation chance for replacing a gene
+            elif random.random()<.05: #mutation chance for replacing a gene
                 mutation = (random.random()-.5)*2*(10**-5)
                 mutated_dna[random.randrange(average_dna.shape[0])][random.randrange(average_dna.shape[1])] = mutation
-            self.blobs.append(Blob(x, y, 10, mutated_dna))
+            self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
  
 class Blob(object):
     """ Represents a ball in my brick breaker game """
@@ -176,7 +176,7 @@ class Blob(object):
         # if self.center_y>screen_size[1]:
         #     self.center_y=int(screen_size[1])
 
-        self.energy -= .3
+        self.energy -= .1
         if self.energy < 0:
             self.alive=False
             self.score_int = self.score()
