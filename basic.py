@@ -85,22 +85,45 @@ class Model(object):
 
         #If all blobs are dead, start new cycle
         if len(self.blobs) <= 0:
-            top_two = sorted(model.DNAresults, key=lambda x:x[1])[-2:]
-            #print top_two
-            average_dna = (1/2.) * np.add(top_two[0][0], top_two[1][0])
-            
-            for i in range(0, blob_num):
-                x = random.randint(0, screen_size[0])
-                y = random.randint(0, screen_size[1])
-                mutation = (1/100.) * random.randint(85, 115)
-                mutated_dna = average_dna * mutation
-                self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
+            # num_winners = int( blob_num/5)
+
+            # if num_winners%2 != 0:
+            #     num_winners+=1
+            # if num_winners<2:
+            #     num_winners=2
+
+            self.gene_recombination()
             self.DNAresults = []
             global sim_num
-            if sim_num % 50 == 0:
-                print 'generation {} complete'.format(sim_num)
             sim_num+=1
+            if sim_num % 10 == 0:
+                print 'generation {} complete'.format(sim_num)
+            
+    def gene_recombination(self, num_winners=2):
+        """Handles gene mutation and recombination"""
+        top_scoring = sorted(self.DNAresults, key=lambda x:x[1])[-num_winners:]
 
+        #average_dna = (1/2.) * np.add(top_two[0][0], top_two[1][0])
+        average_dna = np.zeros(top_scoring[0][0].shape)
+
+        #take a random gene from one of the parents
+        for i in range(average_dna.shape[0]):
+            for j in range( average_dna.shape[1]):
+                average_dna[i][j]=random.choice([top_scoring[0][0][i][j], 
+                    top_scoring[1][0][i][j]])
+
+        #mutate one, make a new blob
+        for i in range(0, blob_num):
+            x = random.randint(0, screen_size[0])
+            y = random.randint(0, screen_size[1])
+            mutated_dna = np.copy(average_dna)
+            if random.random()<.6: #mutation chance for altering a gene
+                mutation = (random.random()-.5)*2*(10**-7)
+                mutated_dna[random.randrange(average_dna.shape[0])][random.randrange(average_dna.shape[1])] += mutation
+            elif random.random()<.6: #mutation chance for replacing a gene
+                mutation = (random.random()-.5)*2*(10**-5)
+                mutated_dna[random.randrange(average_dna.shape[0])][random.randrange(average_dna.shape[1])] = mutation
+            self.blobs.append(Blob(x, y, 10, mutated_dna))
  
 class Blob(object):
     """ Represents a ball in my brick breaker game """
@@ -252,10 +275,7 @@ if __name__ == '__main__':
                 if not controller.handle_event(event):
                     running = False
         model.update()
-
-        if sim_num > 2000:
-            if sim_num % sim_skip_num == 0:
-                view.draw()
-                time.sleep(0.01)
+        if sim_num % sim_skip_num == 0:
+            view.draw()
 
 
