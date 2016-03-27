@@ -61,21 +61,19 @@ class Model(object):
         self.blobs = []
         self.foods = []
         self.DNAresults = []
-        #create blobs
-        for i in range(0, blob_num):
-            x = random.randint(0, screen_size[0])
-            y = random.randint(0, screen_size[1])
-            matrix = np.random.uniform(-.0001,.0001,(2,6))
-            self.blobs.append(Blob(x, y, 10, matrix))
         #create foods
         for i in range(0, 1):
             x = screen_size[0]/2 #random.randint(0, screen_size[0])
             y = screen_size[1]/2 #random.randint(0, screen_size[1])
             radius = random.randint(5, 10)
             self.foods.append(Food(x, y, radius))
-            #velocity_y/abs(self.velocity_y))*self.MAX_VELOCITY
+        #create blobs
+        for i in range(0, blob_num):
+            x = random.randint(0, screen_size[0])
+            y = random.randint(0, screen_size[1])
+            matrix = np.random.uniform(-.0001,.0001,(2,4))
+            self.blobs.append(Blob(x, y, 10, matrix, self.foods[0]))
 
-        #print self.velocity_x, self.velocity_y
         # multiplies positions vector by DNA to produce velocity
         # changes self.vele[1])
 
@@ -96,17 +94,17 @@ class Model(object):
                 y = random.randint(0, screen_size[1])
                 mutation = (1/100.) * random.randint(85, 115)
                 mutated_dna = average_dna * mutation
-                self.blobs.append(Blob(x, y, 10, mutated_dna))
+                self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
             self.DNAresults = []
             global sim_num
-            if sim_num % 10 == 0:
+            if sim_num % 50 == 0:
                 print 'generation {} complete'.format(sim_num)
             sim_num+=1
 
  
 class Blob(object):
     """ Represents a ball in my brick breaker game """
-    def __init__(self, center_x, center_y, radius, dna):
+    def __init__(self, center_x, center_y, radius, dna, target):
         """ Create a ball object with the specified geometry """
         self.center_x = center_x
         self.center_y = center_y
@@ -121,8 +119,13 @@ class Blob(object):
         self.food_eaten = 0
         self.score_int = 0
         self.DNA = dna  # TODO don't hardcode this
-        #self.init_dist_food = np.hypot()
-        self.dist_moved = 0
+
+        self.target = target
+        self.init_dist_target = np.hypot(
+            self.center_x - self.target.center_x,
+            self.center_y - self.target.center_y
+            )
+        # self.init_dist_food = np.hypot()
 
     def intersect(self, other): 
         """
@@ -137,7 +140,6 @@ class Blob(object):
         self.center_y += self.velocity_y
         self.int_center = int(self.center_x), int(self.center_y)
 
-        self.dist_moved += np.hypot(self.velocity_x, self.velocity_y)
 
         #print (self.center_x, self.center_y)
 
@@ -154,7 +156,7 @@ class Blob(object):
         self.energy -= .3
         if self.energy < 0:
             self.alive=False
-            self.score_int = self.score(model)
+            self.score_int = self.score()
             model.DNAresults.append((self.DNA, self.score_int))
 
             model.blobs.remove(self)
@@ -174,11 +176,9 @@ class Blob(object):
         self.change_vel()
 
     def change_vel(self, printvel = False): 
-        target_food = model.foods[0]
         positions = np.array([
-            self.center_x, self.center_y, 
-            self.velocity_x, self.velocity_y,
-            target_food.center_x, target_food.center_y])
+            self.center_x, self.center_y,
+            self.target.center_x, self.target.center_y])
         acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
 
         self.velocity_x += acceleration_x
@@ -193,14 +193,15 @@ class Blob(object):
         # multiplies positions vector by DNA to produce velocity
         # changes self.vel
       
-    def score(self, model):
-        for food in model.foods:
-            return 1.0/(1 + np.hypot(
-                food.center_x-self.center_x, 
-                food.center_y-self.center_y))
-            # if intersect(self, food):
-            #     score += 1
-            #     food.eaten = True
+    def score(self):
+        final_dist_target = np.hypot(
+            self.center_x - self.target.center_x,
+            self.center_y - self.target.center_y
+            )
+        return self.init_dist_target/final_dist_target
+        # return 1.0/(1 + np.hypot(
+        #     food.center_x-self.center_x, 
+        #     food.center_y-self.center_y))
 
 
 class Food(object):
@@ -224,10 +225,6 @@ class PyGameKeyboardController(object):
             modify the x position of the paddle """
         if event.type != KEYDOWN:
             return True
-        if event.key == pygame.K_LEFT:
-            pass
-        if event.key == pygame.K_RIGHT:
-            pass
         if event.key == pygame.K_SPACE:
             return False
         if event.key == pygame.K_d:
@@ -256,8 +253,9 @@ if __name__ == '__main__':
                     running = False
         model.update()
 
-        if sim_num % sim_skip_num == 0:
-            view.draw()
-            time.sleep(0.01)
+        if sim_num > 2000:
+            if sim_num % sim_skip_num == 0:
+                view.draw()
+                time.sleep(0.01)
 
 
