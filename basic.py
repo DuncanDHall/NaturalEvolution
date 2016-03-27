@@ -1,4 +1,4 @@
-import pygame, numpy, math
+import pygame, math
 import random
 from pygame.locals import QUIT, KEYDOWN
 import time
@@ -7,6 +7,9 @@ import numpy as np
 
 screen_size = (500, 500)
 sim_num = 0
+blob_num = 10
+sim_skip_num = 100 #the number of simulations you want to skip
+
 class PyGameBrickView(object):
     """ Provides a view of the brick breaker model in a pygame
         window """
@@ -30,10 +33,11 @@ class PyGameBrickView(object):
         for blob in self.model.blobs:
             
             if blob.alive:
+                #print blob.int_center
                 pygame.draw.circle(
                     self.screen, 
                     pygame.Color('white'),
-                    (blob.center_x, blob.center_y),
+                    blob.int_center,
                     blob.radius
                     )
 
@@ -58,17 +62,23 @@ class Model(object):
         self.foods = []
         self.DNAresults = []
         #create blobs
-        for i in range(0, 10):
-            x = random.randint(0, 500)
-            y = random.randint(0, 500)
-            matrix = np.random.uniform(-0.0001,0.0001,(2,6))
+        for i in range(0, blob_num):
+            x = random.randint(0, screen_size[0])
+            y = random.randint(0, screen_size[1])
+            matrix = np.random.uniform(-.0001,.0001,(2,6))
             self.blobs.append(Blob(x, y, 10, matrix))
         #create foods
         for i in range(0, 1):
-            x = random.randint(0, 500)
-            y = random.randint(0, 500)
+            x = screen_size[0]/2 #random.randint(0, screen_size[0])
+            y = screen_size[1]/2 #random.randint(0, screen_size[1])
             radius = random.randint(5, 10)
             self.foods.append(Food(x, y, radius))
+            #velocity_y/abs(self.velocity_y))*self.MAX_VELOCITY
+
+        #print self.velocity_x, self.velocity_y
+        # multiplies positions vector by DNA to produce velocity
+        # changes self.vele[1])
+
         
     def update(self):
         """ Update the model state """
@@ -81,9 +91,9 @@ class Model(object):
             #print top_two
             average_dna = (1/2.) * np.add(top_two[0][0], top_two[1][0])
             
-            for i in range(0, 10):
-                x = random.randint(0, 500)
-                y = random.randint(0, 500)
+            for i in range(0, blob_num):
+                x = random.randint(0, screen_size[0])
+                y = random.randint(0, screen_size[1])
                 mutation = (1/100.) * random.randint(85, 115)
                 mutated_dna = average_dna * mutation
                 self.blobs.append(Blob(x, y, 10, mutated_dna))
@@ -93,7 +103,7 @@ class Model(object):
                 print 'generation {} complete'.format(sim_num)
             sim_num+=1
 
-
+ 
 class Blob(object):
     """ Represents a ball in my brick breaker game """
     def __init__(self, center_x, center_y, radius, dna):
@@ -103,7 +113,7 @@ class Blob(object):
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = radius
         self.velocity_x = 0         # pixels / frame
-        self.velocity_y = -1         # pixels / frame
+        self.velocity_y = 0         # pixels / frame
         self.MAX_VELOCITY = 100
         self.energy = 100
         self.MAX_ENERGY = 100
@@ -111,7 +121,9 @@ class Blob(object):
         self.food_eaten = 0
         self.score_int = 0
         self.DNA = dna  # TODO don't hardcode this
-        
+        #self.init_dist_food = np.hypot()
+        self.dist_moved = 0
+
     def intersect(self, other): 
         """
         Requires both objects to have center_x, center_y, and radius attributes
@@ -119,10 +131,15 @@ class Blob(object):
         dist = abs(math.hypot(self.center_x-other.center_x, self.center_y-other.center_y))
         return dist < self.radius + other.radius
 
-    def update(self, model):
+    def update(self, model, printvel = False):
         """ Update the position of the ball due to time passing """
-        self.center_x += int(self.velocity_x)
-        self.center_y += int(self.velocity_y)
+        self.center_x += self.velocity_x
+        self.center_y += self.velocity_y
+        self.int_center = int(self.center_x), int(self.center_y)
+
+        self.dist_moved += np.hypot(self.velocity_x, self.velocity_y)
+
+        #print (self.center_x, self.center_y)
 
         # if self.center_x<0:
         #     self.center_x=0
@@ -142,27 +159,28 @@ class Blob(object):
 
             model.blobs.remove(self)
 
-        for i in range(len(model.foods)-1, -1, -1):
-            food = model.foods[i]
-            if self.intersect(food):
-                self.food_eaten +=1
+        # for i in range(len(model.foods)-1, -1, -1):
+        #     food = model.foods[i]
+        #     if self.intersect(food):
+        #         self.food_eaten +=1
 
-                model.foods.remove(food)
+        #         model.foods.remove(food)
 
-                x = random.randint(0, 500)
-                y = random.randint(0, 500)
-                radius = random.randint(5, 10)
-                model.foods.append(Food(x, y, radius))
+        #         x = random.randint(0, 500)
+        #         y = random.randint(0, 500)
+        #         radius = random.randint(5, 10)
+        #         model.foods.append(Food(x, y, radius))
 
         self.change_vel()
 
-    def change_vel(self): 
+    def change_vel(self, printvel = False): 
         target_food = model.foods[0]
         positions = np.array([
             self.center_x, self.center_y, 
             self.velocity_x, self.velocity_y,
             target_food.center_x, target_food.center_y])
         acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
+
         self.velocity_x += acceleration_x
         self.velocity_y += acceleration_y
         
@@ -170,6 +188,8 @@ class Blob(object):
             self.velocity_x = (self.velocity_x/abs(self.velocity_x))*self.MAX_VELOCITY
         if abs(self.velocity_y)>self.MAX_VELOCITY:
             self.velocity_y = (self.velocity_y/abs(self.velocity_y))*self.MAX_VELOCITY
+
+        #print self.velocity_x, self.velocity_y
         # multiplies positions vector by DNA to produce velocity
         # changes self.vel
       
@@ -191,7 +211,7 @@ class Food(object):
         self.center_x = center_x
         self.center_y = center_y
         self.radius = radius
-        #self.color = color
+        # self.color = color
         self.eaten = False
 
 
@@ -235,7 +255,9 @@ if __name__ == '__main__':
                 if not controller.handle_event(event):
                     running = False
         model.update()
-        if sim_num > 1000:
+
+        if sim_num % sim_skip_num == 0:
             view.draw()
             time.sleep(0.01)
+
 
