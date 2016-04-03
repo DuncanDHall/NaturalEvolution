@@ -17,14 +17,14 @@ While creating the presentation, we had a long discussion about what direction w
 When re-reading our post-its, we realized it would have been a good idea to give more direction with our prompts. As we presented it, we ended up with ideas which were outside of the range of directions we wanted to consider taking our project. So for the future: we should use stickies when we’re looking for a wide range of ideas.
 
 ### Next steps:
-Continue exploring how to encode DNA for creatures. We were given a lot ideas as to how achieve rich creature behavior.  We need to make decisions regarding whether we want to explore neural networks or other DNA implementations. This will probably mean looking at actual implementations of neural networks very soon.
-Check out Creature Docking Station, see what is applicable
-Continue exploring how to mutate DNA.  Like the DNA, people brought up different ways achieving interesting DNA mutation.  We want to explore neuroevolution of augmenting topologies (NEAT), and mathematical functions for other implementations.  Most of the feedback was about user driven mutations, this would be more applicable if we wanted to make a game.
-Design work: there is some interest about user input.  This largely depends on what kind of simulation we can make, but this is a potential area we can explore.  For example, we could have user created terrain in attempt to find interesting speciation.
-Compelling problem/species: speciation in different environments, invasive species, fight against “boss” (user designed boss?), cannibalism, social behavior
+* Continue exploring how to encode DNA for creatures. We were given a lot ideas as to how achieve rich creature behavior.  We need to make decisions regarding whether we want to explore neural networks or other DNA implementations. This will probably mean looking at actual implementations of neural networks very soon.
+* Check out Creature Docking Station, see what is applicable
+* Continue exploring how to mutate DNA.  Like the DNA, people brought up different ways achieving interesting DNA mutation.  We want to explore neuroevolution of augmenting topologies (NEAT), and mathematical functions for other implementations.  Most of the feedback was about user driven mutations, this would be more applicable if we wanted to make a game.
+* Design work: there is some interest about user input.  This largely depends on what kind of simulation we can make, but this is a potential area we can explore.  For example, we could have user created terrain in attempt to find interesting speciation.
+* Compelling problem/species: speciation in different environments, invasive species, fight against “boss” (user designed boss?), cannibalism, social behavior
 
 
 ### Deltas for future reviews:
-Start presentation with a brief agenda
-Assign homework so people can understand the difference between Natural and Artificial selection
-Consider group discussions Vs. post it notes. Use post it notes only when you want to gather ideas in many directions. Also with more directed prompts.
+* Start presentation with a brief agenda
+* Assign homework so people can understand the difference between Natural and Artificial selection
+* Consider group discussions Vs. post it notes. Use post it notes only when you want to gather ideas in many directions. Also with more directed prompts.
