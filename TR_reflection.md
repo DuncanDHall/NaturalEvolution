@@ -2,7 +2,7 @@
 
 ### Reflection and Decisions
 
-Many people suggested that we create a game. People may have been biased by how we framed the questions (Making the only explicit suggestion for a more compelling project be a game). Nevertheless, it is interesting to see that people want to see more user interaction. 
+Many people suggested that we create a game. People may have been biased by how we framed the questions (Making the only explicit suggestion for a more compelling project be a game). Nevertheless, it is interesting to see that people want to see more user interaction. At the least, we hope to make a custom menu where users can play with the initial conditions.
 
 There was also popular sentiment that dictionaries with keys linking to behaviors would be a strong way to implement what we’re trying to do. However, we don’t want to have to dictate every possible behavior. The group has concluded that dictionaries do not allow the flexibility or permissibility required to achieve rich and interesting behavior. Instead, we are opting to explore whether or not we can create rich and interesting behavior through a classifications of basic decisions such as accelerate, decelerate, turn left, and turn right. We want to allows blobs to develop their own complicated behaviors implicit to the patterns in their DNA (just as with reading real-world DNA, As, Ts, Cs, and Gs have been around for quite a while, but new behaviors are produced frequently).
 
