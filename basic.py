@@ -285,7 +285,7 @@ if __name__ == '__main__':
                 if not controller.handle_event(event):
                     running = False
         model.update()
-        if sim_num % sim_skip_num == 0:
+        if sim_num % sim_skip_num == 0 or sim_num in [5, 10, 25, 50, 75]:
             view.draw()
 
     # nn = NN()
