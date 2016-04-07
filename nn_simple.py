@@ -144,14 +144,14 @@ class NN(object):
             parents_NN should be passed in as a tuple of NN objects
         """
         if parents_NN is not None:
-            self.W1, self.W2 = self.have_sex(*parents_NN)
+            self.W1, self.W2 = self.get_recombine(*parents_NN)
 
         else:
             self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
             self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
 
     # THIS IS WHERE MY BRAIN GAVE OUT
-    def have_sex(self, parents_NN):
+    def get_recombine(self, parents_NN):
         # TODO: HEELP
         new_W_list = []
         pool_W1 = [parent.W1 for parent in parents_NN]
