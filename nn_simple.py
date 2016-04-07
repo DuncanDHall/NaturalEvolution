@@ -144,7 +144,7 @@ class NN(object):
             parents_NN should be passed in as a tuple of NN objects
         """
         if parents_NN is not None:
-            self.W1, self.W2 = self.have_sex(*parents_NN)
+            self.W1, self.W2 = self.have_sex(parents_NN)
 
         else:
             self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
@@ -152,26 +152,30 @@ class NN(object):
 
     # THIS IS WHERE MY BRAIN GAVE OUT
     def have_sex(self, parents_NN):
-        # TODO: HEELP
-        new_W_list = []
-        pool_W1 = [parent.W1 for parent in parents_NN]
-        pool_W2 = [parent.W2 for parent in parents_NN]
-        pool_Ws = (pool_W1, pool_W2)
-        for i, W in enumerate[W1, W2]:
-            new_W_list.append(weights)
+        # # TODO: HEELP
+        # new_W_list = []
+        # pool_W1 = [parent.W1 for parent in parents_NN]
+        # pool_W2 = [parent.W2 for parent in parents_NN]
+        # pool_Ws = (pool_W1, pool_W2)
+        # for i, W in enumerate[W1, W2]:
+        #     new_W_list.append(weights)
 
-        # for W_parent1, W_parent2 in [(nn_1.W1, nn_2.W1), (nn_1.W2, nn_2.W2)]:
-        #     dim1 = shape(W_parent1)
-        #     dim2 = shape(W_parent2)
-        #     if dim1 != dim2:
-        #         raise ValueError
-        #     new_W = np.zeros(dim1)
-        #     for r in dim1[0]:
-        #         for c in dim1[1]:
-        #             new_W[r][c] = random.choice(
-        #                 W_parent1[r, c], W_parent2[r][c])
-        #     new_W_list.append(new_W)
-        # return tuple(new_W_list)
+        list_ws = [(n.W1, n.W2) for n in parents_NN]
+        print list_ws
+        zipped = zip(*list_ws)
+        print zipped
+        for W_parent1, W_parent2 in zip(*list_ws):
+            dim1 = shape(W_parent1)
+            dim2 = shape(W_parent2)
+            if dim1 != dim2:
+                raise ValueError
+            new_W = np.zeros(dim1)
+            for r in dim1[0]:
+                for c in dim1[1]:
+                    new_W[r][c] = random.choice(
+                        W_parent1[r, c], W_parent2[r][c])
+            new_W_list.append(new_W)
+        return tuple(new_W_list)
 
     def process(self, z1):
         """ propigates the signal through the neural network """
