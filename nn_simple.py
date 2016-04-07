@@ -12,6 +12,8 @@ BLOB_NUM = 10
 SIM_SKIP_NUM = 100  # the number of simulations you want to skip
 NUM_PARENTS = 2
 
+NUM_NODES = 2
+
 
 class PyGameView(object):
     """ Provides a view of the environment in a pygame
@@ -68,8 +70,9 @@ class Model(object):
         # create foods
         for i in range(0, FOOD_NUM):
             x, y = (d/2 for d in SCREEN_SIZE)
-            x = random.randint(0 + BORDER, SCREEN_SIZE[0] - BORDER)
-            y = random.randint(0 + BORDER, SCREEN_SIZE[1] - BORDER)
+            border = 20
+            x = random.randint(0 + border, SCREEN_SIZE[0] - border)
+            y = random.randint(0 + border, SCREEN_SIZE[1] - border)
             radius = random.randint(5, 10)
             self.foods.append(Food(x, y, radius))
 
@@ -77,7 +80,7 @@ class Model(object):
         for i in range(0, BLOB_NUM):
             x = random.randint(0, SCREEN_SIZE[0])
             y = random.randint(0, SCREEN_SIZE[1])
-            self.blobs.append(Blob(x, y, 10, self.foods[0]))
+            self.blobs.append(Blob(self.foods[0]))
 
         # multiplies positions vector by DNA to produce velocity
         # changes self.vele[1])
@@ -144,8 +147,8 @@ class NN(object):
             self.W1, self.W2 = self.have_sex(*parents_NN)
 
         else:
-            self.W1 = np.random.uniform(-1, 1, (2, 3))
-            self.W2 = np.random.uniform(-1, 1, (3, 2))
+            self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
+            self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
 
     # THIS IS WHERE MY BRAIN GAVE OUT
     def have_sex(self, parents_NN):
@@ -189,7 +192,7 @@ class NN(object):
 
 class Blob(object):
     """ Represents a ball in my brick breaker game """
-    def __init__(self, nn=None):
+    def __init__(self, target, nn=None):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
@@ -203,6 +206,7 @@ class Blob(object):
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
+        self.target = target
 
         # Neural Network stuff here:
         if nn is not None:
@@ -265,8 +269,8 @@ class Blob(object):
         #     self.target.center_x, self.target.center_y])
         # acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
 
-        self.velocity_x += acceleration_x/100
-        self.velocity_y += acceleration_y/100
+        self.velocity_x = acceleration_x/10
+        self.velocity_y = acceleration_y/10
 
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
