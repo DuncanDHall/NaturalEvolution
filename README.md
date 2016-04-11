@@ -10,7 +10,9 @@ Natural Evolution is a simulation of a natural selection and speciation, using g
 
 #### Dependencies
 Python 2.7
+
 Pygame 1.9.1 – [get it](http://www.pygame.org/wiki/GettingStarted)
+
 Numpy 1.10.4 – [get it](http://www.scipy.org/scipylib/download.html)
 
 #### How To Use
