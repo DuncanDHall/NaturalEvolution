@@ -9,16 +9,17 @@
 Natural Evolution is a simulation of a natural selection and speciation, using genetic algorithms and neural networks.  It shows the evolution of organisms that eat food and reproduce “at will” (through neural networks).
 
 #### Dependencies
-Python 2.7
-
-Pygame 1.9.1 – [get it](http://www.pygame.org/wiki/GettingStarted)
-
-Numpy 1.10.4 – [get it](http://www.scipy.org/scipylib/download.html)
+* Python 2.7
+* Pygame 1.9.1 – [get it](http://www.pygame.org/wiki/GettingStarted)
+* Numpy 1.10.4 – [get it](http://www.scipy.org/scipylib/download.html)
 
 #### How To Use
-From terminal
+From terminal:
+```
+git clone 
 python nn_simple.py
 
+```
 #### License
 Copyright (c) 2016 Serena Chen, Duncan Hall, David Papp, and Nathan Yee
 
