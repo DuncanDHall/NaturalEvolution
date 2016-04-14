@@ -3,8 +3,8 @@ import math
 import random
 import time
 from pygame.locals import QUIT, KEYDOWN
-# from random import choice
-# from math import pi, sin, cos, atan
+from random import choice
+from math import pi, sin, cos, atan
 import numpy as np
 
 SCREEN_SIZE = (500, 500)
@@ -27,7 +27,7 @@ class PyGameView(object):
         self.screen = pygame.display.set_mode(size)
 
     def draw(self):
-        """ Draw the game to the pygame window """
+        """ Draw the simulation to the pygame window """
         # fill background
         self.screen.fill(pygame.Color('black'))
 
@@ -108,6 +108,7 @@ class Model(object):
 
         for i in range(0, BLOB_NUM):
             new_NN = NN(parents_NN=top_scoring)
+            # TODO: Check if dna results are the blobs or others >> hmm?
             self.blobs.append(Blob(self.foods[0], new_NN))
 
 
@@ -152,6 +153,7 @@ class NN(object):
 
     def process(self, z1):
         """ propigates the signal through the neural network """
+        #print z1
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
         a2 = self.sigmoid(z2)
@@ -161,13 +163,15 @@ class NN(object):
         return a3
 
     def sigmoid(self, z):
-
+        # Apply sigmoid activation function (arctan):
+        # TODO: why does sigmoid not work?
+        #return z
         sig = 10*(1/(1+np.exp(-z))-.5)
-        return sig
+        return sig#50*(1/(1+np.exp(z)))
 
 
 class Blob(object):
-    """ Represents a blob agent """
+    """ Represents a blob. """
     def __init__(self, target, nn=None):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
@@ -185,7 +189,7 @@ class Blob(object):
         self.target = target
 
         # direction changes:
-        # self.direction = random.uniform(0, 2*pi)
+        self.direction = random.uniform(0, 2*pi)
 
         # Neural Network stuff here:
         if nn is not None:
@@ -194,17 +198,19 @@ class Blob(object):
             self.nn = NN()
 
     def intersect(self, other):
-        """ Requires both objects to have center_x, center_y, and radius
+        """ Returns true if two objects intersect.Requires both objects to have center_x, center_y, and radius
             attributes
         """
         dist = abs(math.hypot(
-            self.center_x - other.center_x, self.center_y - other.center_y))
+            self.center_x-other.center_x, self.center_y-other.center_y))
         return dist < self.radius + other.radius
 
     def update(self, model):
-        """ Update the position of the ball due to time passing """
+        """ Update the position of a blob and evaluates its energy. """
         self.center_x += self.velocity_x
         self.center_y += self.velocity_y
+        # self.center_x += self.energy/50 * cos(self.direction)
+        # self.center_y += self.energy/50 * sin(self.direction)
 
         self.int_center = int(self.center_x), int(self.center_y)
 
@@ -227,6 +233,7 @@ class Blob(object):
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
+                # global SCREEN_SIZE
                 model.foods.append(
                     Food(
                         random.randint(10, SCREEN_SIZE[0]-10),
@@ -241,12 +248,19 @@ class Blob(object):
             self.center_y - self.target.center_y])
         acceleration_x, acceleration_y = tuple(self.nn.process(env))
 
+        # positions = np.array([
+        #     self.center_x, self.center_y,
+        # change matrix dimensions in model init and update:
+        #     # self.velocity_x, self.velocity_y,
+        #     self.target.center_x, self.target.center_y])
+        # acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
+
         self.velocity_x = acceleration_x
         self.velocity_y = acceleration_y
 
-        # self.direction = atan(acceleration_x/acceleration_y)
+        self.direction = atan(acceleration_x/acceleration_y)
 
-        # self.direction = atan(acceleration_x/acceleration_y)
+        self.direction = atan(acceleration_x/acceleration_y)
 
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
@@ -259,13 +273,20 @@ class Blob(object):
 
     def score(self):
         return self.food_eaten
+        # final_dist_target = np.hypot(
+        #     self.center_x - self.target.center_x,
+        #     self.center_y - self.target.center_y
+        #     )
+        # return self.init_dist_target/final_dist_target
+        # return 1.0/(1 + np.hypot(
+        #     food.center_x-self.center_x,
+        #     food.center_y-self.center_y))
 
 
 class Food(object):
-    """ Represents a food entity """
+    """ Represents a piece of food in our game. """
     def __init__(self, center_x, center_y, radius):
-        """ Initializes a Brick object with the specified
-            geometry and color """
+        """ Initializes a food object to a specified center and radius. """
         self.center_x = center_x
         self.center_y = center_y
         self.radius = radius
@@ -278,8 +299,7 @@ class PyGameKeyboardController(object):
         self.model = model
 
     def handle_event(self, event):
-        """ Look for left and right keypresses to
-            modify the x position of the paddle """
+        """ Looks for keyboard events. """
         if event.type != KEYDOWN:
             return True
         if event.key == pygame.K_SPACE:
@@ -313,6 +333,7 @@ if __name__ == '__main__':
         if model.generation % SIM_SKIP_NUM == 0:
             view.draw()
             time.sleep(.001)
+
 
     # nn = NN()
     # z1 = np.array([-1, 1])
