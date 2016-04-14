@@ -4,6 +4,7 @@ import random
 import time
 from pygame.locals import QUIT, KEYDOWN
 from random import choice
+from math import pi, sin, cos, atan
 import numpy as np
 
 SCREEN_SIZE = (500, 500)
@@ -13,6 +14,8 @@ SIM_SKIP_NUM = 100  # the number of simulations you want to skip
 NUM_PARENTS = 2
 
 NUM_NODES = 2
+MUTATION_RATE = 0.2
+MUTATION_AMOUNT = 0.5
 
 
 class PyGameView(object):
@@ -108,33 +111,6 @@ class Model(object):
             # TODO: Check if dna results are the blobs or others >> hmm?
             self.blobs.append(Blob(self.foods[0], new_NN))
 
-        # take a random gene from one of the parents
-        # for i in range(average_dna.shape[0]):
-        #     for j in range( average_dna.shape[1]):
-        #         average_dna[i][j]=random.choice([top_scoring[0][0][i][j],
-        #             top_scoring[1][0][i][j]])
-
-        # #mutate one, make a new blob
-        # for i in range(0, BLOB_NUM):
-        #     x = random.randint(0, SCREEN_SIZE[0])
-        #     y = random.randint(0, SCREEN_SIZE[1])
-        #     mutated_dna = np.copy(average_dna)
-        #     if random.random()<.6: #mutation chance for altering a gene
-        #         mutation = (random.random()-.5)*2*(10**-7)
-        #         mutated_dna[
-        #             random.randrange(average_dna.shape[0])
-        #         ][
-        #             random.randrange(average_dna.shape[1])
-        #         ] += mutation
-        #     elif random.random()<0.4: #mutation chance for replacing a gene
-        #         mutation = (random.random()-.5)*2*(10**-5)
-        #         mutated_dna[
-        #               random.randrange(average_dna.shape[0])
-        #           ][
-        #               random.randrange(average_dna.shape[1])
-        #           ] += mutation
-        #     self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
-
 
 class NN(object):
     """ Represents the Neural Network of a blob """
@@ -150,21 +126,14 @@ class NN(object):
             self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
             self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
 
-    # THIS IS WHERE MY BRAIN GAVE OUT
     def get_recombine(self, parents_NN):
-        # # TODO: HEELP
         new_W_list = []
-        # pool_W1 = [parent.W1 for parent in parents_NN]
-        # pool_W2 = [parent.W2 for parent in parents_NN]
-        # pool_Ws = (pool_W1, pool_W2)
-        # for i, W in enumerate[W1, W2]:
-        #     new_W_list.append(weights)
 
         list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
 
         for W_parents in zip(*list_ws):
             dim = W_parents[0].shape
-            
+
             for w_par in W_parents:
                 if w_par.shape != dim:
                     raise ValueError
@@ -172,12 +141,19 @@ class NN(object):
             for r in range(dim[0]):
                 for c in range(dim[1]):
                     new_W[r][c] = random.choice(
-                        [n[r][c] for n in W_parents])
+                        [n[r][c] for n in W_parents]) + \
+                        self.get_mutation()
             new_W_list.append(new_W)
         return tuple(new_W_list)
 
+    def get_mutation(self):
+        if np.random.rand() < MUTATION_RATE:
+            return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
+        return 0
+
     def process(self, z1):
         """ propigates the signal through the neural network """
+        #print z1
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
         a2 = self.sigmoid(z2)
@@ -189,8 +165,9 @@ class NN(object):
     def sigmoid(self, z):
         # Apply sigmoid activation function (arctan):
         # TODO: why does sigmoid not work?
-        return z
-        # return 1/(1+np.exp(-z))
+        #return z
+        sig = 10*(1/(1+np.exp(-z))-.5)
+        return sig#50*(1/(1+np.exp(z)))
 
 
 class Blob(object):
@@ -203,13 +180,16 @@ class Blob(object):
         self.radius = random.randint(5, 10)
         self.velocity_x = 0         # pixels / frame
         self.velocity_y = 0         # pixels / frame
-        self.MAX_VELOCITY = 100
+        self.MAX_VELOCITY = 5
         self.energy = 100
         self.MAX_ENERGY = 100
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
+
+        # direction changes:
+        self.direction = random.uniform(0, 2*pi)
 
         # Neural Network stuff here:
         if nn is not None:
@@ -229,9 +209,12 @@ class Blob(object):
         """ Update the position of the ball due to time passing """
         self.center_x += self.velocity_x
         self.center_y += self.velocity_y
+        # self.center_x += self.energy/50 * cos(self.direction)
+        # self.center_y += self.energy/50 * sin(self.direction)
+
         self.int_center = int(self.center_x), int(self.center_y)
 
-        self.energy -= .3
+        self.energy -= .1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -272,8 +255,12 @@ class Blob(object):
         #     self.target.center_x, self.target.center_y])
         # acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
 
-        self.velocity_x = acceleration_x/10
-        self.velocity_y = acceleration_y/10
+        self.velocity_x = acceleration_x
+        self.velocity_y = acceleration_y
+
+        self.direction = atan(acceleration_x/acceleration_y)
+
+        self.direction = atan(acceleration_x/acceleration_y)
 
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
@@ -327,6 +314,7 @@ class PyGameKeyboardController(object):
                 blob.energy = 0
         return True
 
+
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
@@ -347,7 +335,7 @@ if __name__ == '__main__':
         if model.generation % SIM_SKIP_NUM == 0:
             view.draw()
             time.sleep(.001)
-        
+
 
     # nn = NN()
     # z1 = np.array([-1, 1])
