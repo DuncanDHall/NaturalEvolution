@@ -155,40 +155,6 @@ class NN(object):
         self.hiddenLayerSize = 4
         self.W1 = np.random.uniform(-1, 1, (self.inputLayerSize, self.hiddenLayerSize))
         self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
-        # if parents_NN is not None:
-        #     self.W1, self.W2 = self.get_recombine(parents_NN)
-
-        # else:
-        #     self.W1 = np.random.uniform(-1, 1, (self.inputLayerSize, self.hiddenLayerSize))
-        #     self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
-            # self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
-            # self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
-
-    # THIS IS WHERE MY BRAIN GAVE OUT
-    def get_recombine(self, parents_NN):
-        # # TODO: HEELP
-        new_W_list = []
-        # pool_W1 = [parent.W1 for parent in parents_NN]
-        # pool_W2 = [parent.W2 for parent in parents_NN]
-        # pool_Ws = (pool_W1, pool_W2)
-        # for i, W in enumerate[W1, W2]:
-        #     new_W_list.append(weights)
-
-        list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
-
-        for W_parents in zip(*list_ws):
-            dim = W_parents[0].shape
-            
-            for w_par in W_parents:
-                if w_par.shape != dim:
-                    raise ValueError
-            new_W = np.zeros(dim)
-            for r in range(dim[0]):
-                for c in range(dim[1]):
-                    new_W[r][c] = random.choice(
-                        [n[r][c] for n in W_parents])
-            new_W_list.append(new_W)
-        return tuple(new_W_list)
 
     def process(self, z1):
         """ propigates the signal through the neural network """
@@ -198,17 +164,6 @@ class NN(object):
         # input and output to level 3 (results)
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
-
-        # print "inputs"
-        # print z1
-        # print "z2"
-        # print z2
-        # print "a2"
-        # print a2
-        # print "z3"
-        # print z3
-        # print "a3"
-        # print a3
 
         return np.argmax(a3)
 
@@ -258,17 +213,19 @@ class Blob(object):
             ])
         decision = self.nn.process(env)
 
-        if decision == 1: #move forward
+        if decision == 0: #move forward
             self.center_x += self.MAX_VELOCITY * np.cos(self.angle)
             self.center_y += self.MAX_VELOCITY * np.sin(self.angle)
             self.int_center = int(self.center_x), int(self.center_y)
-        if decision == 2: #turn left
+        if decision == 1: #turn counter clockwise
+            self.angle -= .05
+        if decision == 2: #turn clockwise
             self.angle += .05
-        if decision == 3: #turn right
-            self.angle += -.05
 
-        if self.angle < 0 or self.angle > 2*np.pi:
-            self.angle = self.angle % np.pi        
+        if self.angle > 2*np.pi:
+            self.angle = self.angle % np.pi       
+        if self.angle < -2*np.pi:
+            self.angle = -self.angle % np.pi 
 
         self.energy -= 0
         if self.energy < 0:
