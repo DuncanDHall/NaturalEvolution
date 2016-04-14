@@ -19,6 +19,8 @@ $ git clone https://github.com/DuncanDHall/NaturalEvolution.git
 ```
 $ python nn_simple.py
 ```
+At this point, a PyGame window should appear displaying 10 white "blobs" and one orange "food", which begin interacting. Pressing space stops the program and closes the window.
+
 #### License
 Copyright (c) 2016 Serena Chen, Duncan Hall, David Papp, and Nathan Yee
 
