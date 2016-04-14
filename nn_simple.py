@@ -4,6 +4,7 @@ import random
 import time
 from pygame.locals import QUIT, KEYDOWN
 from random import choice
+from math import pi, sin, cos, atan
 import numpy as np
 
 SCREEN_SIZE = (500, 500)
@@ -13,6 +14,8 @@ SIM_SKIP_NUM = 100  # the number of simulations you want to skip
 NUM_PARENTS = 2
 
 NUM_NODES = 2
+MUTATION_RATE = 0.2
+MUTATION_AMOUNT = 0.1
 
 
 class PyGameView(object):
@@ -150,21 +153,14 @@ class NN(object):
             self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
             self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
 
-    # THIS IS WHERE MY BRAIN GAVE OUT
     def get_recombine(self, parents_NN):
-        # # TODO: HEELP
         new_W_list = []
-        # pool_W1 = [parent.W1 for parent in parents_NN]
-        # pool_W2 = [parent.W2 for parent in parents_NN]
-        # pool_Ws = (pool_W1, pool_W2)
-        # for i, W in enumerate[W1, W2]:
-        #     new_W_list.append(weights)
 
         list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
 
         for W_parents in zip(*list_ws):
             dim = W_parents[0].shape
-            
+
             for w_par in W_parents:
                 if w_par.shape != dim:
                     raise ValueError
@@ -172,9 +168,15 @@ class NN(object):
             for r in range(dim[0]):
                 for c in range(dim[1]):
                     new_W[r][c] = random.choice(
-                        [n[r][c] for n in W_parents])
+                        [n[r][c] for n in W_parents]) + \
+                        self.get_mutation()
             new_W_list.append(new_W)
         return tuple(new_W_list)
+
+    def get_mutation(self):
+        if np.random.rand() < MUTATION_RATE:
+            return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
+        return 0
 
     def process(self, z1):
         """ propigates the signal through the neural network """
@@ -213,6 +215,9 @@ class Blob(object):
         self.score_int = 0
         self.target = target
 
+        # direction changes:
+        self.direction = random.uniform(0, 2*pi)
+
         # Neural Network stuff here:
         if nn is not None:
             self.nn = nn
@@ -231,6 +236,9 @@ class Blob(object):
         """ Update the position of the ball due to time passing """
         self.center_x += self.velocity_x
         self.center_y += self.velocity_y
+        # self.center_x += self.energy/50 * cos(self.direction)
+        # self.center_y += self.energy/50 * sin(self.direction)
+
         self.int_center = int(self.center_x), int(self.center_y)
 
         self.energy -= .1
@@ -276,6 +284,8 @@ class Blob(object):
 
         self.velocity_x = acceleration_x
         self.velocity_y = acceleration_y
+
+        self.direction = atan(acceleration_x/acceleration_y)
 
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
@@ -329,6 +339,7 @@ class PyGameKeyboardController(object):
                 blob.energy = 0
         return True
 
+
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
@@ -349,7 +360,7 @@ if __name__ == '__main__':
         if model.generation % SIM_SKIP_NUM == 0:
             view.draw()
             time.sleep(.001)
-        
+
 
     # nn = NN()
     # z1 = np.array([-1, 1])
