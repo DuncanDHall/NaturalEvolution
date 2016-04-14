@@ -178,6 +178,7 @@ class NN(object):
 
     def process(self, z1):
         """ propigates the signal through the neural network """
+        #print z1
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
         a2 = self.sigmoid(z2)
@@ -189,8 +190,9 @@ class NN(object):
     def sigmoid(self, z):
         # Apply sigmoid activation function (arctan):
         # TODO: why does sigmoid not work?
-        return z
-        # return 1/(1+np.exp(-z))
+        #return z
+        sig = 10*(1/(1+np.exp(-z))-.5)
+        return sig#50*(1/(1+np.exp(z)))
 
 
 class Blob(object):
@@ -203,7 +205,7 @@ class Blob(object):
         self.radius = random.randint(5, 10)
         self.velocity_x = 0         # pixels / frame
         self.velocity_y = 0         # pixels / frame
-        self.MAX_VELOCITY = 100
+        self.MAX_VELOCITY = 5
         self.energy = 100
         self.MAX_ENERGY = 100
         self.alive = True
@@ -231,7 +233,7 @@ class Blob(object):
         self.center_y += self.velocity_y
         self.int_center = int(self.center_x), int(self.center_y)
 
-        self.energy -= .3
+        self.energy -= .1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -272,8 +274,8 @@ class Blob(object):
         #     self.target.center_x, self.target.center_y])
         # acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
 
-        self.velocity_x = acceleration_x/10
-        self.velocity_y = acceleration_y/10
+        self.velocity_x = acceleration_x
+        self.velocity_y = acceleration_y
 
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
