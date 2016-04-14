@@ -3,8 +3,8 @@ import math
 import random
 import time
 from pygame.locals import QUIT, KEYDOWN
-from random import choice
-from math import pi, sin, cos, atan
+# from random import choice
+# from math import pi, sin, cos, atan
 import numpy as np
 
 SCREEN_SIZE = (500, 500)
@@ -85,9 +85,6 @@ class Model(object):
             y = random.randint(0, SCREEN_SIZE[1])
             self.blobs.append(Blob(self.foods[0]))
 
-        # multiplies positions vector by DNA to produce velocity
-        # changes self.vele[1])
-
     def update(self):
         """ Update the model state """
         for blob in reversed(self.blobs):
@@ -153,7 +150,6 @@ class NN(object):
 
     def process(self, z1):
         """ propigates the signal through the neural network """
-        #print z1
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
         a2 = self.sigmoid(z2)
@@ -164,10 +160,8 @@ class NN(object):
 
     def sigmoid(self, z):
         # Apply sigmoid activation function (arctan):
-        # TODO: why does sigmoid not work?
-        #return z
         sig = 10*(1/(1+np.exp(-z))-.5)
-        return sig#50*(1/(1+np.exp(z)))
+        return sig
 
 
 class Blob(object):
@@ -198,8 +192,8 @@ class Blob(object):
             self.nn = NN()
 
     def intersect(self, other):
-        """ Returns true if two objects intersect.Requires both objects to have center_x, center_y, and radius
-            attributes
+        """ Returns true if two objects intersect.Requires both objects to
+            have center_x, center_y, and radius attributes
         """
         dist = abs(math.hypot(
             self.center_x-other.center_x, self.center_y-other.center_y))
@@ -233,7 +227,6 @@ class Blob(object):
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
-                # global SCREEN_SIZE
                 model.foods.append(
                     Food(
                         random.randint(10, SCREEN_SIZE[0]-10),
@@ -248,19 +241,12 @@ class Blob(object):
             self.center_y - self.target.center_y])
         acceleration_x, acceleration_y = tuple(self.nn.process(env))
 
-        # positions = np.array([
-        #     self.center_x, self.center_y,
-        # change matrix dimensions in model init and update:
-        #     # self.velocity_x, self.velocity_y,
-        #     self.target.center_x, self.target.center_y])
-        # acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
-
         self.velocity_x = acceleration_x
         self.velocity_y = acceleration_y
 
-        self.direction = atan(acceleration_x/acceleration_y)
+        # self.direction = atan(acceleration_x/acceleration_y)
 
-        self.direction = atan(acceleration_x/acceleration_y)
+        # self.direction = atan(acceleration_x/acceleration_y)
 
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
@@ -273,14 +259,6 @@ class Blob(object):
 
     def score(self):
         return self.food_eaten
-        # final_dist_target = np.hypot(
-        #     self.center_x - self.target.center_x,
-        #     self.center_y - self.target.center_y
-        #     )
-        # return self.init_dist_target/final_dist_target
-        # return 1.0/(1 + np.hypot(
-        #     food.center_x-self.center_x,
-        #     food.center_y-self.center_y))
 
 
 class Food(object):
@@ -333,7 +311,6 @@ if __name__ == '__main__':
         if model.generation % SIM_SKIP_NUM == 0:
             view.draw()
             time.sleep(.001)
-
 
     # nn = NN()
     # z1 = np.array([-1, 1])
