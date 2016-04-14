@@ -290,19 +290,7 @@ class Blob(object):
             ])
         return self.nn.process(env)
 
-    def update(self, model):
-        """ 
-        Update the all aspects of blob based on neural net decisions
-        """
-
-        [decision, dist_mag, angle_mag] = self.process_neural_net()
-
-        self.add_to_num_dist_spins(decision)
-
-        self.decision_tree(decision, dist_mag, angle_mag)
-
-
-
+    def is_alive(self):
         self.energy -= .1
         if self.energy < 0:
             self.alive = False
@@ -311,11 +299,10 @@ class Blob(object):
 
             model.blobs.remove(self)
 
-        # self.change_vel()
-
+    def eat_food(self, model):
         for i in range(len(model.foods)-1, -1, -1):
             f = model.foods[i]
-            if self.intersect(f):
+            if self.intersect(f): #where is this global f defined
                 self.food_eaten += 1
                 self.energy += 50
                 if self.energy > self.MAX_ENERGY:
@@ -328,6 +315,24 @@ class Blob(object):
                         random.randint(10, SCREEN_SIZE[0]-10),
                         random.randint(10, SCREEN_SIZE[1]-10),
                         random.randint(5, 10)))
+
+
+
+    def update(self, model):
+        """ 
+        Update the all aspects of blob based on neural net decisions
+        """
+
+        [decision, dist_mag, angle_mag] = self.process_neural_net()
+
+        self.add_to_num_dist_spins(decision)
+
+        self.decision_tree(decision, dist_mag, angle_mag)
+
+        self.is_alive()
+
+        self.eat_food(model)
+
 
         self.target = model.foods[0]
 
