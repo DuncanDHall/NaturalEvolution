@@ -287,6 +287,8 @@ class Blob(object):
 
         self.direction = atan(acceleration_x/acceleration_y)
 
+        self.direction = atan(acceleration_x/acceleration_y)
+
         if abs(self.velocity_x) > self.MAX_VELOCITY:
             self.velocity_x = (
                 self.velocity_x/abs(self.velocity_x)
