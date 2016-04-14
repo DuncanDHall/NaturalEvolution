@@ -15,7 +15,7 @@ NUM_PARENTS = 2
 
 NUM_NODES = 2
 MUTATION_RATE = 0.2
-MUTATION_AMOUNT = 0.1
+MUTATION_AMOUNT = 0.5
 
 
 class PyGameView(object):
@@ -110,33 +110,6 @@ class Model(object):
             new_NN = NN(parents_NN=top_scoring)
             # TODO: Check if dna results are the blobs or others >> hmm?
             self.blobs.append(Blob(self.foods[0], new_NN))
-
-        # take a random gene from one of the parents
-        # for i in range(average_dna.shape[0]):
-        #     for j in range( average_dna.shape[1]):
-        #         average_dna[i][j]=random.choice([top_scoring[0][0][i][j],
-        #             top_scoring[1][0][i][j]])
-
-        # #mutate one, make a new blob
-        # for i in range(0, BLOB_NUM):
-        #     x = random.randint(0, SCREEN_SIZE[0])
-        #     y = random.randint(0, SCREEN_SIZE[1])
-        #     mutated_dna = np.copy(average_dna)
-        #     if random.random()<.6: #mutation chance for altering a gene
-        #         mutation = (random.random()-.5)*2*(10**-7)
-        #         mutated_dna[
-        #             random.randrange(average_dna.shape[0])
-        #         ][
-        #             random.randrange(average_dna.shape[1])
-        #         ] += mutation
-        #     elif random.random()<0.4: #mutation chance for replacing a gene
-        #         mutation = (random.random()-.5)*2*(10**-5)
-        #         mutated_dna[
-        #               random.randrange(average_dna.shape[0])
-        #           ][
-        #               random.randrange(average_dna.shape[1])
-        #           ] += mutation
-        #     self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
 
 
 class NN(object):
