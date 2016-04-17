@@ -1,21 +1,13 @@
 import pygame
-import math
 import random
 import time
 from pygame.locals import QUIT, KEYDOWN
 # from random import choice
 # from math import pi, sin, cos, atan
-import numpy as np
-
-SCREEN_SIZE = (500, 500)
-FOOD_NUM = 1
-BLOB_NUM = 10
-SIM_SKIP_NUM = 100  # the number of simulations you want to skip
-NUM_PARENTS = 2
-
-NUM_NODES = 2
-MUTATION_RATE = 0.2
-MUTATION_AMOUNT = 0.5
+from constants import *
+from food import *
+from blob import *
+from constants import *
 
 
 class PyGameView(object):
@@ -107,169 +99,6 @@ class Model(object):
             new_NN = NN(parents_NN=top_scoring)
             # TODO: Check if dna results are the blobs or others >> hmm?
             self.blobs.append(Blob(self.foods[0], new_NN))
-
-
-class NN(object):
-    """ Represents the Neural Network of a blob """
-    def __init__(self, parents_NN=None):
-        """ this neural network takes in difference in x and y position between
-            the agent and a single food entity.
-            parents_NN should be passed in as a tuple of NN objects
-        """
-        if parents_NN is not None:
-            self.W1, self.W2 = self.get_recombine(parents_NN)
-
-        else:
-            self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
-            self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
-
-    def get_recombine(self, parents_NN):
-        new_W_list = []
-
-        list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
-
-        for W_parents in zip(*list_ws):
-            dim = W_parents[0].shape
-
-            for w_par in W_parents:
-                if w_par.shape != dim:
-                    raise ValueError
-            new_W = np.zeros(dim)
-            for r in range(dim[0]):
-                for c in range(dim[1]):
-                    new_W[r][c] = random.choice(
-                        [n[r][c] for n in W_parents]) + \
-                        self.get_mutation()
-            new_W_list.append(new_W)
-        return tuple(new_W_list)
-
-    def get_mutation(self):
-        if np.random.rand() < MUTATION_RATE:
-            return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
-        return 0
-
-    def process(self, z1):
-        """ propigates the signal through the neural network """
-        # input and output to level 2 (nodes)
-        z2 = z1.dot(self.W1)
-        a2 = self.sigmoid(z2)
-        # input and output to level 3 (results)
-        z3 = a2.dot(self.W2)
-        a3 = self.sigmoid(z3)
-        return a3
-
-    def sigmoid(self, z):
-        # Apply sigmoid activation function (arctan):
-        sig = 10*(1/(1+np.exp(-z))-.5)
-        return sig
-
-
-class Blob(object):
-    """ Represents a blob. """
-    def __init__(self, target, nn=None):
-        """ Create a ball object with the specified geometry """
-        self.center_x = random.randint(0, SCREEN_SIZE[0])
-        self.center_y = random.randint(0, SCREEN_SIZE[1])
-        self.int_center = int(self.center_x), int(self.center_y)
-        self.radius = random.randint(5, 10)
-        self.velocity_x = 0         # pixels / frame
-        self.velocity_y = 0         # pixels / frame
-        self.MAX_VELOCITY = 5
-        self.energy = 100
-        self.MAX_ENERGY = 100
-        self.alive = True
-        self.food_eaten = 0
-        self.score_int = 0
-        self.target = target
-
-        # direction changes:
-        self.direction = random.uniform(0, 2*pi)
-
-        # Neural Network stuff here:
-        if nn is not None:
-            self.nn = nn
-        else:
-            self.nn = NN()
-
-    def intersect(self, other):
-        """ Returns true if two objects intersect.Requires both objects to
-            have center_x, center_y, and radius attributes
-        """
-        dist = abs(math.hypot(
-            self.center_x-other.center_x, self.center_y-other.center_y))
-        return dist < self.radius + other.radius
-
-    def update(self, model):
-        """ Update the position of a blob and evaluates its energy. """
-        self.center_x += self.velocity_x
-        self.center_y += self.velocity_y
-        # self.center_x += self.energy/50 * cos(self.direction)
-        # self.center_y += self.energy/50 * sin(self.direction)
-
-        self.int_center = int(self.center_x), int(self.center_y)
-
-        self.energy -= .1
-        if self.energy < 0:
-            self.alive = False
-            self.score_int = self.score()
-            model.vip_genes.append((self.score_int, self.nn))
-
-            model.blobs.remove(self)
-
-        self.change_vel()
-
-        for i in range(len(model.foods)-1, -1, -1):
-            f = model.foods[i]
-            if self.intersect(f):
-                self.food_eaten += 1
-                self.energy += 0
-                if self.energy > self.MAX_ENERGY:
-                    self.energy = self.MAX_ENERGY
-
-                del model.foods[i]
-                model.foods.append(
-                    Food(
-                        random.randint(10, SCREEN_SIZE[0]-10),
-                        random.randint(10, SCREEN_SIZE[1]-10),
-                        random.randint(5, 10)))
-
-        self.target = model.foods[0]
-
-    def change_vel(self):
-        env = np.array([
-            self.center_x - self.target.center_x,
-            self.center_y - self.target.center_y])
-        acceleration_x, acceleration_y = tuple(self.nn.process(env))
-
-        self.velocity_x = acceleration_x
-        self.velocity_y = acceleration_y
-
-        # self.direction = atan(acceleration_x/acceleration_y)
-
-        # self.direction = atan(acceleration_x/acceleration_y)
-
-        if abs(self.velocity_x) > self.MAX_VELOCITY:
-            self.velocity_x = (
-                self.velocity_x/abs(self.velocity_x)
-                )*self.MAX_VELOCITY
-        if abs(self.velocity_y) > self.MAX_VELOCITY:
-            self.velocity_y = (
-                self.velocity_y/abs(self.velocity_y)
-                )*self.MAX_VELOCITY
-
-    def score(self):
-        return self.food_eaten
-
-
-class Food(object):
-    """ Represents a piece of food in our game. """
-    def __init__(self, center_x, center_y, radius):
-        """ Initializes a food object to a specified center and radius. """
-        self.center_x = center_x
-        self.center_y = center_y
-        self.radius = radius
-        # self.color = color
-        self.eaten = False
 
 
 class PyGameKeyboardController(object):
