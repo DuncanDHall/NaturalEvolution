@@ -189,7 +189,7 @@ class Blob(object):
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         self.int_center = int(self.center_x), int(self.center_y)
-        self.radius = random.randint(5, 10)
+        self.radius = random.randint(10, 20)
         self.angle = random.uniform(0,np.pi)
         self.MAX_VELOCITY = 5
         self.energy = 100
@@ -302,12 +302,22 @@ class Blob(object):
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
+
                 # global SCREEN_SIZE
                 model.foods.append(
                     Food(
                         random.randint(10, SCREEN_SIZE[0]-10),
                         random.randint(10, SCREEN_SIZE[1]-10),
                         random.randint(5, 10)))
+
+                model.blobs.append(Blob(model.foods[0], self.nn))
+
+                if len(model.blobs) > 10:
+                    energy_list = []
+                    for blob in model.blobs:
+                        energy_list.append(blob.energy)
+                    del model.blobs[np.argmin(energy_list)]
+
 
 
     def score(self):
