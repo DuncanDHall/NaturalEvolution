@@ -4,18 +4,25 @@ import random
 
 
 class NN(object):
-    """ Represents the Neural Network of a blob """
+    """ Represents the Neural Network of a blob 
+    """
+
+
     def __init__(self, parents_NN=None):
-        """ this neural network takes in difference in x and y position between
-            the agent and a single food entity.
+        """ this neural network takes in the distance and relative angle between
+            the blob and it's target food
             parents_NN should be passed in as a tuple of NN objects
         """
+
+        self.inputLayerSize = 2
+        self.outputLayerSize = 2
+        self.hiddenLayerSize = 4
+
         if parents_NN is not None:
             self.W1, self.W2 = self.get_recombine(parents_NN)
-
         else:
-            self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
-            self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
+            self.W1 = np.random.uniform(-1, 1, (self.inputLayerSize, self.hiddenLayerSize))
+            self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
     def get_recombine(self, parents_NN):
         new_W_list = []
@@ -50,9 +57,10 @@ class NN(object):
         # input and output to level 3 (results)
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
-        return a3
+
+        return [a3[0], a3[1]]
 
     def sigmoid(self, z):
-        # Apply sigmoid activation function (arctan):
-        sig = 10*(1/(1+np.exp(-z))-.5)
-        return sig
+        # Apply sigmoid activation function
+        # -.5 allows negative values for proper angle rotations
+        return (1/(1+np.exp(-z))) - .5

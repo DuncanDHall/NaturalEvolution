@@ -1,5 +1,4 @@
 import pygame
-import math
 import random
 import time
 from pygame.locals import QUIT, KEYDOWN
@@ -214,7 +213,7 @@ class Blob(object):
         tells whether or not two objects are intersecting.  This will
         primarily be used to determine if a blob eats food
         """
-        dist = abs(math.hypot(
+        dist = abs(np.hypot(
             self.center_x-other.center_x, self.center_y-other.center_y))
         return dist < self.radius + other.radius
 

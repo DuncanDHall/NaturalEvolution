@@ -2,8 +2,6 @@ import pygame
 import random
 import time
 from pygame.locals import QUIT, KEYDOWN
-# from random import choice
-# from math import pi, sin, cos, atan
 from constants import *
 from food import *
 from blob import *
