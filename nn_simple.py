@@ -129,7 +129,8 @@ class PyGameKeyboardController(object):
         return True
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': #our program is not called "main.py", do we need to
+                           #change this?
     pygame.init()
     size = SCREEN_SIZE
 
@@ -148,7 +149,7 @@ if __name__ == '__main__':
         model.update()
         if model.show_gen:
             view.draw()
-            #time.sleep(.005)
+            time.sleep(.001)
 
     # nn = NN()
     # z1 = np.array([-1, 1])
