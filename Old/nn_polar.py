@@ -13,10 +13,9 @@ BLOB_NUM = 10
 SIM_SKIP_NUM = 100  # the number of simulations you want to skip
 NUM_PARENTS = 2
 
-NUM_NODES = 2
+
 MUTATION_RATE = 0.2
 MUTATION_AMOUNT = 0.5
-
 
 class PyGameView(object):
     """ Provides a view of the environment in a pygame
@@ -27,7 +26,7 @@ class PyGameView(object):
         self.screen = pygame.display.set_mode(size)
 
     def draw(self):
-        """ Draw the simulation to the pygame window """
+        """ Draw the game to the pygame window """
         # fill background
         self.screen.fill(pygame.Color('black'))
 
@@ -46,6 +45,12 @@ class PyGameView(object):
                     blob.int_center,
                     blob.radius
                     )
+                pygame.draw.line(
+                    self.screen, 
+                    pygame.Color('red'), 
+                    blob.int_center, 
+                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
+                    1)
 
         # draw food
         for food in self.model.foods:
@@ -85,6 +90,9 @@ class Model(object):
             y = random.randint(0, SCREEN_SIZE[1])
             self.blobs.append(Blob(self.foods[0]))
 
+        # multiplies positions vector by DNA to produce velocity
+        # changes self.vele[1])
+
     def update(self):
         """ Update the model state """
         for blob in reversed(self.blobs):
@@ -108,7 +116,6 @@ class Model(object):
             # TODO: Check if dna results are the blobs or others >> hmm?
             self.blobs.append(Blob(self.foods[0], new_NN))
 
-
 class NN(object):
     """ Represents the Neural Network of a blob """
     def __init__(self, parents_NN=None):
@@ -116,12 +123,16 @@ class NN(object):
             the agent and a single food entity.
             parents_NN should be passed in as a tuple of NN objects
         """
+
+        self.inputLayerSize = 3
+        self.outputLayerSize = 5
+        self.hiddenLayerSize = 6
+
         if parents_NN is not None:
             self.W1, self.W2 = self.get_recombine(parents_NN)
-
         else:
-            self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
-            self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
+            self.W1 = np.random.uniform(-1, 1, (self.inputLayerSize, self.hiddenLayerSize))
+            self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
     def get_recombine(self, parents_NN):
         new_W_list = []
@@ -156,34 +167,37 @@ class NN(object):
         # input and output to level 3 (results)
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
-        return a3
+
+        return [np.argmax(a3[0:2]), a3[3], a3[4]]
 
     def sigmoid(self, z):
-        # Apply sigmoid activation function (arctan):
-        sig = 10*(1/(1+np.exp(-z))-.5)
-        return sig
+        # Apply sigmoid activation function
+        return 1/(1+np.exp(-z))
 
 
 class Blob(object):
-    """ Represents a blob. """
+    """ Represents a ball in my natural evolution simulation """
     def __init__(self, target, nn=None):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
-        self.velocity_x = 0         # pixels / frame
-        self.velocity_y = 0         # pixels / frame
+        self.angle = random.uniform(0,np.pi)
         self.MAX_VELOCITY = 5
         self.energy = 100
-        self.MAX_ENERGY = 100
+        self.MAX_ENERGY = 200
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
 
-        # direction changes:
-        self.direction = random.uniform(0, 2*pi)
+        self.num_dist_spins = 0
+        self.previous_decision = 3
+
+        self.previous_center_x = self.center_x
+        self.previous_center_y = self.center_y
+        self.dist_moved = 0
 
         # Neural Network stuff here:
         if nn is not None:
@@ -191,23 +205,93 @@ class Blob(object):
         else:
             self.nn = NN()
 
+    def add_to_num_dist_spins(self, decision):
+        """
+        updates self.num_dist_spins if the blob has moved and turned 
+        in the past two frame.
+        This will be used in the scoring function
+        """
+        if decision != self.previous_decision:
+            if decision == 0 or self.previous_decision == 0:
+                self.num_dist_spins += 1
+        self.previous_decision = decision
+
+    def add_to_dist_moved(self):
+        """
+        updates self.dist_moved if the blob has moved in the past frame.
+        This will be used in the scoring function
+        """
+        change = ((self.previous_center_x - self.center_x)**2
+                          + (self.previous_center_y - self.center_y)**2)**(1./2)
+    
+        self.dist_moved += change
+
     def intersect(self, other):
-        """ Returns true if two objects intersect.Requires both objects to
-            have center_x, center_y, and radius attributes
+        """ 
+        tells whether or not two objects are intersecting.  This will
+        primarily be used to determine if a blob eats food
         """
         dist = abs(math.hypot(
             self.center_x-other.center_x, self.center_y-other.center_y))
         return dist < self.radius + other.radius
 
-    def update(self, model):
-        """ Update the position of a blob and evaluates its energy. """
-        self.center_x += self.velocity_x
-        self.center_y += self.velocity_y
-        # self.center_x += self.energy/50 * cos(self.direction)
-        # self.center_y += self.energy/50 * sin(self.direction)
+    def out_of_bounds(self):
+        """
+        moves the blob to the other side of the screen 
+        if it moves out of bounds.  It will also make sure angle is
+        between 0 and 2pi 
+        """
+        if self.center_x<0:
+            self.center_x=int(SCREEN_SIZE[0])+self.center_x
+        if self.center_x>SCREEN_SIZE[0]:
+            self.center_x=0+(self.center_x-int(SCREEN_SIZE[0]))
 
-        self.int_center = int(self.center_x), int(self.center_y)
+        if self.center_y <0:
+            self.center_y=int(SCREEN_SIZE[1])+self.center_y
+        if self.center_y>SCREEN_SIZE[1]:
+            self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
 
+        if self.angle > 2*np.pi:
+            self.angle = self.angle % np.pi       
+        if self.angle < -2*np.pi:
+            self.angle = -self.angle % np.pi 
+
+    def decision_tree(self, decision, dist_mag, angle_mag):
+        """
+        modifies the position or angle based on neural net decision
+
+        """
+        if decision == 0: #move forward
+            self.center_x += (1 + dist_mag)**2 * np.cos(self.angle)
+            self.center_y += (1 + dist_mag)**2 * np.sin(self.angle)
+            self.out_of_bounds()
+
+            self.int_center = int(self.center_x), int(self.center_y)
+
+            self.add_to_dist_moved()
+            self.previous_center_x = self.center_x
+            self.previous_center_y = self.center_y
+
+        if decision == 1: #turn counter clockwise
+            self.angle -= angle_mag
+
+        if decision == 2: #turn clockwise
+            self.angle += angle_mag
+
+    def process_neural_net(self):
+        """
+        create environment and process through neural net brain
+        """
+        deltaX = self.target.center_x - self.center_x
+        deltaY = self.target.center_y - self.center_y
+        env = np.array([
+            deltaX,
+            deltaY,
+            self.angle - np.arctan(deltaX/(deltaY+.000001))
+            ])
+        return self.nn.process(env)
+
+    def is_alive(self):
         self.energy -= .1
         if self.energy < 0:
             self.alive = False
@@ -216,55 +300,55 @@ class Blob(object):
 
             model.blobs.remove(self)
 
-        self.change_vel()
-
+    def eat_food(self, model):
         for i in range(len(model.foods)-1, -1, -1):
             f = model.foods[i]
-            if self.intersect(f):
+            if self.intersect(f): #where is this global f defined
                 self.food_eaten += 1
-                self.energy += 0
+                self.energy += 50
                 if self.energy > self.MAX_ENERGY:
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
+                # global SCREEN_SIZE
                 model.foods.append(
                     Food(
                         random.randint(10, SCREEN_SIZE[0]-10),
                         random.randint(10, SCREEN_SIZE[1]-10),
                         random.randint(5, 10)))
 
+
+
+    def update(self, model):
+        """ 
+        Update the all aspects of blob based on neural net decisions
+        """
+
+        [decision, dist_mag, angle_mag] = self.process_neural_net()
+
+        self.add_to_num_dist_spins(decision)
+
+        self.decision_tree(decision, dist_mag, angle_mag)
+
+        self.is_alive()
+
+        self.eat_food(model)
+
+
         self.target = model.foods[0]
 
-    def change_vel(self):
-        env = np.array([
-            self.center_x - self.target.center_x,
-            self.center_y - self.target.center_y])
-        acceleration_x, acceleration_y = tuple(self.nn.process(env))
-
-        self.velocity_x = acceleration_x
-        self.velocity_y = acceleration_y
-
-        # self.direction = atan(acceleration_x/acceleration_y)
-
-        # self.direction = atan(acceleration_x/acceleration_y)
-
-        if abs(self.velocity_x) > self.MAX_VELOCITY:
-            self.velocity_x = (
-                self.velocity_x/abs(self.velocity_x)
-                )*self.MAX_VELOCITY
-        if abs(self.velocity_y) > self.MAX_VELOCITY:
-            self.velocity_y = (
-                self.velocity_y/abs(self.velocity_y)
-                )*self.MAX_VELOCITY
-
     def score(self):
-        return self.food_eaten
-
+        return (
+            self.dist_moved * 
+            (.1 + self.food_eaten) * 
+            self.num_dist_spins
+            )
 
 class Food(object):
-    """ Represents a piece of food in our game. """
+    """ Represents a brick in my brick breaker game """
     def __init__(self, center_x, center_y, radius):
-        """ Initializes a food object to a specified center and radius. """
+        """ Initializes a Brick object with the specified
+            geometry and color """
         self.center_x = center_x
         self.center_y = center_y
         self.radius = radius
@@ -277,7 +361,8 @@ class PyGameKeyboardController(object):
         self.model = model
 
     def handle_event(self, event):
-        """ Looks for keyboard events. """
+        """ Look for left and right keypresses to
+            modify the x position of the paddle """
         if event.type != KEYDOWN:
             return True
         if event.key == pygame.K_SPACE:
@@ -289,7 +374,6 @@ class PyGameKeyboardController(object):
             for blob in model.blobs:
                 blob.energy = 0
         return True
-
 
 if __name__ == '__main__':
     pygame.init()
@@ -310,7 +394,8 @@ if __name__ == '__main__':
         model.update()
         if model.generation % SIM_SKIP_NUM == 0:
             view.draw()
-            time.sleep(.001)
+            time.sleep(.01)
+        
 
     # nn = NN()
     # z1 = np.array([-1, 1])

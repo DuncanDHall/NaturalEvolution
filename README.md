@@ -20,7 +20,7 @@ From terminal:
 $ git clone https://github.com/DuncanDHall/NaturalEvolution.git
 ```
 ```
-$ python nn_simple.py
+$ python main.py 
 ```
 At this point, a PyGame window should appear displaying 10 white "blobs" and one orange "food", which begin interacting. Pressing space stops the program and closes the window.
 
