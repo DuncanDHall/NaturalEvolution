@@ -209,9 +209,8 @@ class Blob(object):
 
 
     def intersect(self, other):
-        """ 
-        tells whether or not two objects are intersecting.  This will
-        primarily be used to determine if a blob eats food
+        """ tells whether or not two objects are intersecting.  
+            This will primarily be used to determine if a blob eats food
         """
         dist = abs(np.hypot(
             self.center_x-other.center_x, self.center_y-other.center_y))
@@ -219,10 +218,8 @@ class Blob(object):
 
 
     def out_of_bounds(self):
-        """
-        moves the blob to the other side of the screen 
-        if it moves out of bounds.  It will also make sure angle is
-        between 0 and 2pi 
+        """ moves the blob to the other side of the screen if it moves out of 
+            bounds.  It will also make sure angle is between 0 and 2pi 
         """
         if self.center_x<0:
             self.center_x=int(SCREEN_SIZE[0])+self.center_x
@@ -241,26 +238,28 @@ class Blob(object):
 
 
     def update_position(self, deltaDist):
+        """ update_position based on an output from the neural net.  In
+            addition, update attribute self.dist_moved for scoring related
+            purposes
+        """
         self.center_x += (1 + deltaDist)**2 * np.cos(self.angle)
         self.center_y += (1 + deltaDist)**2 * np.sin(self.angle)
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
-        #add dist_moved to score
+        #update scoring
         self.dist_moved += deltaDist
 
 
     def update_angle(self, delta_angle):
-        """
-        update_angle changes the angle based on an output from the neural net.
-        also update num_opposite_spins if direction is different than previous
+        """ update_angle changes the angle based on an output from the neural
+            net.
         """
         self.angle += delta_angle
 
 
     def process_neural_net(self):
-        """
-        create environment and process through neural net brain
+        """ create environment and process through neural net brain
         """
         deltaX = self.target.center_x - self.center_x
         deltaY = self.target.center_y - self.center_y
@@ -275,6 +274,12 @@ class Blob(object):
 
 
     def is_alive(self):
+        """ is_alive updates the energy of the blob based on a constant value.
+            If the energy drops below zero, then remove the blob and add it
+            score the model.vip_genes list.
+
+            TODO: make blob lose energy based on distance moved
+        """
         self.energy -= .1
         if self.energy < 0:
             self.alive = False
@@ -285,6 +290,12 @@ class Blob(object):
 
 
     def eat_food(self, model):
+        """ eat_food tests whether or not a blob eats food on a given frame.
+            If a blobl eats food, add to the blobs energy and remove the food.
+            In addition, asexually reproduce based on its neural net dna, and
+            do some population control.
+
+        """
         for i in range(len(model.foods)-1, -1, -1):
             f = model.foods[i]
             if self.intersect(f): #where is this global f defined
@@ -313,12 +324,17 @@ class Blob(object):
 
 
     def score(self):
+        """ score is the scoring / fitness function.  Try to make as simple as
+            possible while still getting interesting behavior
+        """
         return self.dist_moved * (1 + self.food_eaten)
 
 
     def update(self, model):
-        """ 
-        Update the all aspects of blob based on neural net decisions
+        """ Update the all aspects of blob based on neural net decisions. Also
+            assign next food target.  
+
+            TODO: make the food targeting a function.
         """
 
         [dist_mag, angle_mag] = self.process_neural_net()
