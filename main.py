@@ -129,8 +129,7 @@ class PyGameKeyboardController(object):
         return True
 
 
-if __name__ == '__main__': #our program is not called "main.py", do we need to
-                           #change this?
+if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
 
