@@ -104,7 +104,7 @@ class Model(object):
 
             self.vip_genes = []
             self.generation += 1
-            if self.generation % 10 == 0:
+            if self.generation % 10 == 0: 
                 print 'generation {} complete'.format(self.generation)
 
     def create_generation(self, num_winners=2):
@@ -189,7 +189,7 @@ class Blob(object):
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         self.int_center = int(self.center_x), int(self.center_y)
-        self.radius = random.randint(10, 20)
+        self.radius = random.randint(5, 10)
         self.angle = random.uniform(0,np.pi)
         self.MAX_VELOCITY = 5
         self.energy = 100
@@ -200,9 +200,6 @@ class Blob(object):
         self.target = target
 
         #scoring related
-        self.last_angle_sign = True
-        self.num_opposite_spins = 0
-
         self.dist_moved = 0
 
         # Neural Network stuff here:
@@ -255,15 +252,11 @@ class Blob(object):
 
 
     def update_angle(self, delta_angle):
-        new_angle = self.angle + delta_angle
-
-        latest_sign = delta_angle > 0
-
-        if latest_sign != self.last_angle_sign:
-            self.num_opposite_spins += 1
-
-        self.last_angle_sign = latest_sign
-        self.angle = new_angle
+        """
+        update_angle changes the angle based on an output from the neural net.
+        also update num_opposite_spins if direction is different than previous
+        """
+        self.angle += delta_angle
 
 
     def process_neural_net(self):
@@ -321,7 +314,7 @@ class Blob(object):
 
 
     def score(self):
-        return self.dist_moved * self.num_opposite_spins * (.1 + self.food_eaten)
+        return self.dist_moved * (1 + self.food_eaten)
 
 
     def update(self, model):
