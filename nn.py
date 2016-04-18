@@ -31,7 +31,7 @@ class NN(object):
 
         for W_parents in zip(*list_ws):
             dim = W_parents[0].shape
-
+ 
             for w_par in W_parents:
                 if w_par.shape != dim:
                     raise ValueError

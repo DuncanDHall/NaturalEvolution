@@ -100,7 +100,7 @@ class Blob(object):
         return self.nn.process(env)
 
 
-    def is_alive(self):
+    def is_alive(self, model):
         """ is_alive updates the energy of the blob based on a constant value.
             If the energy drops below zero, then remove the blob and add it
             score the model.vip_genes list.
@@ -170,7 +170,7 @@ class Blob(object):
 
         self.update_position(dist_mag)
 
-        self.is_alive()
+        self.is_alive(model)
 
         self.eat_food(model)
 
