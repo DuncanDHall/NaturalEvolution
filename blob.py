@@ -9,7 +9,7 @@ import math
 class Blob(object):
     """ Represents a ball in my natural evolution simulation """
 
-    
+
     def __init__(self, target, nn=None):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])

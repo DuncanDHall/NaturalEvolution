@@ -72,7 +72,7 @@ class Model(object):
         self.vip_genes = []
         self.generation = 0
 
-        self.show_gen = False
+        self.show_gen = True
 
         # create foods
         for i in range(0, FOOD_NUM):

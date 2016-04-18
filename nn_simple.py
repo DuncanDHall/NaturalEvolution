@@ -36,6 +36,12 @@ class PyGameView(object):
                     blob.int_center,
                     blob.radius
                     )
+                pygame.draw.line(
+                    self.screen, 
+                    pygame.Color('red'), 
+                    blob.int_center, 
+                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
+                    1)
 
         # draw food
         for food in self.model.foods:
@@ -59,6 +65,8 @@ class Model(object):
         self.foods = []
         self.vip_genes = []
         self.generation = 0
+
+        self.show_gen = True
 
         # create foods
         for i in range(0, FOOD_NUM):
@@ -104,7 +112,8 @@ class PyGameKeyboardController(object):
         self.model = model
 
     def handle_event(self, event):
-        """ Looks for keyboard events. """
+        """ Look for left and right keypresses to
+            modify the x position of the paddle """
         if event.type != KEYDOWN:
             return True
         if event.key == pygame.K_SPACE:
@@ -115,6 +124,8 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
+        if event.key == pygame.K_s:
+            model.show_gen = not model.show_gen
         return True
 
 
@@ -135,9 +146,9 @@ if __name__ == '__main__':
                 if not controller.handle_event(event):
                     running = False
         model.update()
-        if model.generation % SIM_SKIP_NUM == 0:
+        if model.show_gen:
             view.draw()
-            time.sleep(.001)
+            time.sleep(.005)
 
     # nn = NN()
     # z1 = np.array([-1, 1])
