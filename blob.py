@@ -48,18 +48,18 @@ class Blob(object):
         """ moves the blob to the other side of the screen if it moves out of 
             bounds.  It will also make sure angle is between 0 and 2pi 
         """
-        if self.center_x<0:
-            self.center_x=int(SCREEN_SIZE[0])+self.center_x
-        if self.center_x>SCREEN_SIZE[0]:
-            self.center_x=0+(self.center_x-int(SCREEN_SIZE[0]))
+        # if self.center_x<0:
+        #     self.center_x=int(SCREEN_SIZE[0])+self.center_x
+        # if self.center_x>SCREEN_SIZE[0]:
+        #     self.center_x=0+(self.center_x-int(SCREEN_SIZE[0]))
 
-        if self.center_y <0:
-            self.center_y=int(SCREEN_SIZE[1])+self.center_y
-        if self.center_y>SCREEN_SIZE[1]:
-            self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
+        # if self.center_y <0:
+        #     self.center_y=int(SCREEN_SIZE[1])+self.center_y
+        # if self.center_y>SCREEN_SIZE[1]:
+        #     self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
 
         if self.angle > 2*np.pi:
-            self.angle = self.angle % np.pi       
+            self.angle = self.angle % np.pi
         if self.angle < -2*np.pi:
             self.angle = -self.angle % np.pi 
 
@@ -91,11 +91,12 @@ class Blob(object):
         deltaX = self.target.center_x - self.center_x
         deltaY = self.target.center_y - self.center_y
         totalDistance = np.hypot(deltaX, deltaY)
-        changeAngle = self.angle -  np.arctan(deltaY/(deltaX+.000001))
+
+        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - np.arctan2(deltaY, deltaX))
 
         env = np.array([
             totalDistance,
-            changeAngle
+            change_angle
             ])
         return self.nn.process(env)
 
@@ -142,7 +143,7 @@ class Blob(object):
 
                 model.blobs.append(Blob(model.foods[0], self.nn))
 
-                if len(model.blobs) > 10:
+                if len(model.blobs) > BLOB_NUM:
                     energy_list = []
                     for blob in model.blobs:
                         energy_list.append(blob.energy)

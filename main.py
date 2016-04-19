@@ -119,14 +119,21 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_SPACE:
             return False
         if event.key == pygame.K_d:
-            for tup in sorted(model.vip_genes)[-2:]:
-                print tup
+            for blob in model.blobs:
+                print 'W1 is'
+                print blob.nn.W1
+                print ""
+                print "W2 is"
+                print ""
+                print blob.nn.W2
+                break #iterate through first thing in a list
         if event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
         if event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         return True
+
 
 
 if __name__ == '__main__':
