@@ -5,13 +5,12 @@ import random
 from pygame.locals import QUIT, KEYDOWN
 from random import choice
 import numpy as np
-
+#test
 SCREEN_SIZE = (500, 500)
 FOOD_NUM = 1
 BLOB_NUM = 10
 SIM_SKIP_NUM = 100  # the number of simulations you want to skip
 NUM_PARENTS = 2
-
 NUM_NODES = 2
 
 
@@ -144,7 +143,7 @@ class NN(object):
             parents_NN should be passed in as a tuple of NN objects
         """
         if parents_NN is not None:
-            self.W1, self.W2 = self.have_sex(*parents_NN)
+            self.W1, self.W2 = self.have_sex(parents_NN)
 
         else:
             self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
@@ -154,11 +153,19 @@ class NN(object):
     def have_sex(self, parents_NN):
         # TODO: HEELP
         new_W_list = []
-        pool_W1 = [parent.W1 for parent in parents_NN]
-        pool_W2 = [parent.W2 for parent in parents_NN]
+        #pool_W1 = [parent.W1 for parent in parents_NN]
+        #pool_W2 = [parent.W2 for parent in parents_NN]
         pool_Ws = (pool_W1, pool_W2)
+
+        print pool_W1
+        return pool_W1, pool_W2
+
+        """for i in range(0, len(parent)):
+        	for j in range()
+        for i in range(parents)NN
         for i, W in enumerate[W1, W2]:
-            new_W_list.append(weights)
+            new_W_list.append(weights)"""
+
 
         # for W_parent1, W_parent2 in [(nn_1.W1, nn_2.W1), (nn_1.W2, nn_2.W2)]:
         #     dim1 = shape(W_parent1)
