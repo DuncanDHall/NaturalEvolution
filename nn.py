@@ -63,6 +63,7 @@ class NN(object):
 
         return [a3[0] * 5, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
 
+
     def sigmoid(self, z):
         # Apply sigmoid activation function
         # -.5 allows negative values for proper angle rotations
