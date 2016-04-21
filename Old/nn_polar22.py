@@ -1,18 +1,18 @@
 import pygame
-import math
 import random
-# import time
+import time
 from pygame.locals import QUIT, KEYDOWN
 from random import choice
 import numpy as np
-#test
+
 SCREEN_SIZE = (500, 500)
 FOOD_NUM = 1
 BLOB_NUM = 10
-SIM_SKIP_NUM = 100  # the number of simulations you want to skip
+SIM_SKIP_NUM = 10  # the number of simulations you want to skip
 NUM_PARENTS = 2
-NUM_NODES = 2
 
+MUTATION_RATE = 0.2
+MUTATION_AMOUNT = 0.5
 
 class PyGameView(object):
     """ Provides a view of the environment in a pygame
@@ -42,6 +42,12 @@ class PyGameView(object):
                     blob.int_center,
                     blob.radius
                     )
+                pygame.draw.line(
+                    self.screen, 
+                    pygame.Color('red'), 
+                    blob.int_center, 
+                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
+                    1)
 
         # draw food
         for food in self.model.foods:
@@ -65,6 +71,8 @@ class Model(object):
         self.foods = []
         self.vip_genes = []
         self.generation = 0
+
+        self.show_gen = True
 
         # create foods
         for i in range(0, FOOD_NUM):
@@ -95,7 +103,7 @@ class Model(object):
 
             self.vip_genes = []
             self.generation += 1
-            if self.generation % 10 == 0:
+            if self.generation % 10 == 0: 
                 print 'generation {} complete'.format(self.generation)
 
     def create_generation(self, num_winners=2):
@@ -105,80 +113,55 @@ class Model(object):
         for i in range(0, BLOB_NUM):
             new_NN = NN(parents_NN=top_scoring)
             # TODO: Check if dna results are the blobs or others >> hmm?
-            self.blobs.append(Blob(new_NN))
-
-        # take a random gene from one of the parents
-        # for i in range(average_dna.shape[0]):
-        #     for j in range( average_dna.shape[1]):
-        #         average_dna[i][j]=random.choice([top_scoring[0][0][i][j],
-        #             top_scoring[1][0][i][j]])
-
-        # #mutate one, make a new blob
-        # for i in range(0, BLOB_NUM):
-        #     x = random.randint(0, SCREEN_SIZE[0])
-        #     y = random.randint(0, SCREEN_SIZE[1])
-        #     mutated_dna = np.copy(average_dna)
-        #     if random.random()<.6: #mutation chance for altering a gene
-        #         mutation = (random.random()-.5)*2*(10**-7)
-        #         mutated_dna[
-        #             random.randrange(average_dna.shape[0])
-        #         ][
-        #             random.randrange(average_dna.shape[1])
-        #         ] += mutation
-        #     elif random.random()<0.4: #mutation chance for replacing a gene
-        #         mutation = (random.random()-.5)*2*(10**-5)
-        #         mutated_dna[
-        #               random.randrange(average_dna.shape[0])
-        #           ][
-        #               random.randrange(average_dna.shape[1])
-        #           ] += mutation
-        #     self.blobs.append(Blob(x, y, 10, mutated_dna, self.foods[0]))
-
+            self.blobs.append(Blob(self.foods[0], new_NN))
 
 class NN(object):
     """ Represents the Neural Network of a blob """
+
+
     def __init__(self, parents_NN=None):
         """ this neural network takes in difference in x and y position between
             the agent and a single food entity.
             parents_NN should be passed in as a tuple of NN objects
         """
+
+        self.inputLayerSize = 2
+        self.outputLayerSize = 2
+        self.hiddenLayerSize = 4
+
         if parents_NN is not None:
-            self.W1, self.W2 = self.have_sex(parents_NN)
-
+            self.W1, self.W2 = self.get_recombine(parents_NN)
         else:
-            self.W1 = np.random.uniform(-1, 1, (2, NUM_NODES))
-            self.W2 = np.random.uniform(-1, 1, (NUM_NODES, 2))
+            self.W1 = np.random.uniform(-1, 1, (self.inputLayerSize, self.hiddenLayerSize))
+            self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
-    # THIS IS WHERE MY BRAIN GAVE OUT
-    def have_sex(self, parents_NN):
-        # TODO: HEELP
+
+    def get_recombine(self, parents_NN):
         new_W_list = []
-        #pool_W1 = [parent.W1 for parent in parents_NN]
-        #pool_W2 = [parent.W2 for parent in parents_NN]
-        pool_Ws = (pool_W1, pool_W2)
 
-        print pool_W1
-        return pool_W1, pool_W2
+        list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
 
-        """for i in range(0, len(parent)):
-        	for j in range()
-        for i in range(parents)NN
-        for i, W in enumerate[W1, W2]:
-            new_W_list.append(weights)"""
+        for W_parents in zip(*list_ws):
+            dim = W_parents[0].shape
+
+            for w_par in W_parents:
+                if w_par.shape != dim:
+                    raise ValueError
+            new_W = np.zeros(dim)
+            for r in range(dim[0]):
+                for c in range(dim[1]):
+                    new_W[r][c] = random.choice(
+                        [n[r][c] for n in W_parents]) + \
+                        self.get_mutation()
+            new_W_list.append(new_W)
+        return tuple(new_W_list)
 
 
-        # for W_parent1, W_parent2 in [(nn_1.W1, nn_2.W1), (nn_1.W2, nn_2.W2)]:
-        #     dim1 = shape(W_parent1)
-        #     dim2 = shape(W_parent2)
-        #     if dim1 != dim2:
-        #         raise ValueError
-        #     new_W = np.zeros(dim1)
-        #     for r in dim1[0]:
-        #         for c in dim1[1]:
-        #             new_W[r][c] = random.choice(
-        #                 W_parent1[r, c], W_parent2[r][c])
-        #     new_W_list.append(new_W)
-        # return tuple(new_W_list)
+    def get_mutation(self):
+        if np.random.rand() < MUTATION_RATE:
+            return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
+        return 0
+
 
     def process(self, z1):
         """ propigates the signal through the neural network """
@@ -188,32 +171,35 @@ class NN(object):
         # input and output to level 3 (results)
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
-        return a3
+
+        return [a3[0], a3[1]]
+
 
     def sigmoid(self, z):
-        # Apply sigmoid activation function (arctan):
-        # TODO: why does sigmoid not work?
-        return z
-        # return 1/(1+np.exp(-z))
+        # Apply sigmoid activation function
+        return (1/(1+np.exp(-z))) - .5
+
 
 
 class Blob(object):
-    """ Represents a ball in my brick breaker game """
+    """ Represents a ball in my natural evolution simulation """
     def __init__(self, target, nn=None):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
-        self.velocity_x = 0         # pixels / frame
-        self.velocity_y = 0         # pixels / frame
-        self.MAX_VELOCITY = 100
+        self.angle = random.uniform(0,np.pi)
+        self.MAX_VELOCITY = 5
         self.energy = 100
-        self.MAX_ENERGY = 100
+        self.MAX_ENERGY = 200
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
+
+        #scoring related
+        self.dist_moved = 0
 
         # Neural Network stuff here:
         if nn is not None:
@@ -221,21 +207,80 @@ class Blob(object):
         else:
             self.nn = NN()
 
+
     def intersect(self, other):
-        """ Requires both objects to have center_x, center_y, and radius
-            attributes
+        """ tells whether or not two objects are intersecting.  
+            This will primarily be used to determine if a blob eats food
         """
-        dist = abs(math.hypot(
+        dist = abs(np.hypot(
             self.center_x-other.center_x, self.center_y-other.center_y))
         return dist < self.radius + other.radius
 
-    def update(self, model):
-        """ Update the position of the ball due to time passing """
-        self.center_x += self.velocity_x
-        self.center_y += self.velocity_y
+
+    def out_of_bounds(self):
+        """ moves the blob to the other side of the screen if it moves out of 
+            bounds.  It will also make sure angle is between 0 and 2pi 
+        """
+        if self.center_x<0:
+            self.center_x=int(SCREEN_SIZE[0])+self.center_x
+        if self.center_x>SCREEN_SIZE[0]:
+            self.center_x=0+(self.center_x-int(SCREEN_SIZE[0]))
+
+        if self.center_y <0:
+            self.center_y=int(SCREEN_SIZE[1])+self.center_y
+        if self.center_y>SCREEN_SIZE[1]:
+            self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
+
+        if self.angle > 2*np.pi:
+            self.angle = self.angle % np.pi       
+        if self.angle < -2*np.pi:
+            self.angle = -self.angle % np.pi 
+
+
+    def update_position(self, deltaDist):
+        """ update_position based on an output from the neural net.  In
+            addition, update attribute self.dist_moved for scoring related
+            purposes
+        """
+        self.center_x += (1 + deltaDist)**2 * np.cos(self.angle)
+        self.center_y += (1 + deltaDist)**2 * np.sin(self.angle)
+        self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
-        self.energy -= .3
+        #update scoring
+        self.dist_moved += deltaDist
+
+
+    def update_angle(self, delta_angle):
+        """ update_angle changes the angle based on an output from the neural
+            net.
+        """
+        self.angle += delta_angle
+
+
+    def process_neural_net(self):
+        """ create environment and process through neural net brain
+        """
+        deltaX = self.target.center_x - self.center_x
+        deltaY = self.target.center_y - self.center_y
+        totalDistance = np.hypot(deltaX, deltaY)
+        changeAngle = self.angle -  np.arctan(deltaY/(deltaX+.000001))
+
+        env = np.array([
+            totalDistance,
+            changeAngle
+            ])
+        return self.nn.process(env)
+
+
+    def is_alive(self):
+        """ is_alive updates the energy of the blob based on a constant value.
+            If the energy drops below zero, then remove the blob and add it
+            score the model.vip_genes list.
+
+            TODO: make blob lose energy based on distance moved
+        """
+        self.energy -= .1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -243,17 +288,24 @@ class Blob(object):
 
             model.blobs.remove(self)
 
-        self.change_vel()
 
+    def eat_food(self, model):
+        """ eat_food tests whether or not a blob eats food on a given frame.
+            If a blobl eats food, add to the blobs energy and remove the food.
+            In addition, asexually reproduce based on its neural net dna, and
+            do some population control.
+
+        """
         for i in range(len(model.foods)-1, -1, -1):
             f = model.foods[i]
-            if self.intersect(f):
+            if self.intersect(f): #where is this global f defined
                 self.food_eaten += 1
-                self.energy += 0
+                self.energy += 50
                 if self.energy > self.MAX_ENERGY:
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
+
                 # global SCREEN_SIZE
                 model.foods.append(
                     Food(
@@ -261,43 +313,41 @@ class Blob(object):
                         random.randint(10, SCREEN_SIZE[1]-10),
                         random.randint(5, 10)))
 
-        self.target = model.foods[0]
+                model.blobs.append(Blob(model.foods[0], self.nn))
 
-    def change_vel(self):
-        env = np.array([
-            self.center_x - self.target.center_x,
-            self.center_y - self.target.center_y])
-        acceleration_x, acceleration_y = tuple(self.nn.process(env))
+                if len(model.blobs) > 10:
+                    energy_list = []
+                    for blob in model.blobs:
+                        energy_list.append(blob.energy)
+                    del model.blobs[np.argmin(energy_list)]
 
-        # positions = np.array([
-        #     self.center_x, self.center_y,
-        # change matrix dimensions in model init and update:
-        #     # self.velocity_x, self.velocity_y,
-        #     self.target.center_x, self.target.center_y])
-        # acceleration_x, acceleration_y = tuple(self.DNA.dot(positions))
 
-        self.velocity_x = acceleration_x/10
-        self.velocity_y = acceleration_y/10
-
-        if abs(self.velocity_x) > self.MAX_VELOCITY:
-            self.velocity_x = (
-                self.velocity_x/abs(self.velocity_x)
-                )*self.MAX_VELOCITY
-        if abs(self.velocity_y) > self.MAX_VELOCITY:
-            self.velocity_y = (
-                self.velocity_y/abs(self.velocity_y)
-                )*self.MAX_VELOCITY
 
     def score(self):
-        return self.food_eaten
-        # final_dist_target = np.hypot(
-        #     self.center_x - self.target.center_x,
-        #     self.center_y - self.target.center_y
-        #     )
-        # return self.init_dist_target/final_dist_target
-        # return 1.0/(1 + np.hypot(
-        #     food.center_x-self.center_x,
-        #     food.center_y-self.center_y))
+        """ score is the scoring / fitness function.  Try to make as simple as
+            possible while still getting interesting behavior
+        """
+        return self.dist_moved * (1 + self.food_eaten)
+
+
+    def update(self, model):
+        """ Update the all aspects of blob based on neural net decisions. Also
+            assign next food target.  
+
+            TODO: make the food targeting a function.
+        """
+
+        [dist_mag, angle_mag] = self.process_neural_net()
+
+        self.update_angle(angle_mag)
+
+        self.update_position(dist_mag)
+
+        self.is_alive()
+
+        self.eat_food(model)
+
+        self.target = model.foods[0]
 
 
 class Food(object):
@@ -329,6 +379,8 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
+        if event.key == pygame.K_s:
+            model.show_gen = not model.show_gen
         return True
 
 if __name__ == '__main__':
@@ -348,8 +400,10 @@ if __name__ == '__main__':
                 if not controller.handle_event(event):
                     running = False
         model.update()
-        if model.generation % SIM_SKIP_NUM == 0:
+        if model.show_gen:
             view.draw()
+            time.sleep(.01)
+        
 
     # nn = NN()
     # z1 = np.array([-1, 1])

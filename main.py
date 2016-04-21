@@ -7,6 +7,7 @@ from food import *
 from blob import *
 from constants import *
 
+
 class PyGameView(object):
     """ Provides a view of the environment in a pygame
         window """
@@ -31,7 +32,7 @@ class PyGameView(object):
             if blob.alive:
                 pygame.draw.circle(
                     self.screen,
-                    pygame.Color('white'),
+                    pygame.Color(blob.color, blob.color, blob.color),
                     blob.int_center,
                     blob.radius
                     )
@@ -80,17 +81,10 @@ class Model(object):
 
         # create foods
         for i in range(0, FOOD_NUM):
-            x, y = (d/2 for d in SCREEN_SIZE)
-            border = 20
-            x = random.randint(0 + border, SCREEN_SIZE[0] - border)
-            y = random.randint(0 + border, SCREEN_SIZE[1] - border)
-            radius = random.randint(5, 10)
-            self.foods.append(Food(x, y, radius))
+            self.foods.append(Food())
 
         # create blobs
         for i in range(0, BLOB_NUM):
-            x = random.randint(0, SCREEN_SIZE[0])
-            y = random.randint(0, SCREEN_SIZE[1])
             self.blobs.append(Blob(self.foods[0]))
 
     def update(self):
@@ -129,16 +123,21 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_SPACE:
             return False
         if event.key == pygame.K_d:
-            for tup in sorted(model.vip_genes)[-2:]:
-                print tup
+            for blob in model.blobs:
+                print 'W1 is'
+                print blob.nn.W1
+                print ""
+                print "W2 is"
+                print ""
+                print blob.nn.W2
+                break #iterate through first thing in a list
         if event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
         if event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         return True
-
-
+        
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
