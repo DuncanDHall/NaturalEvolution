@@ -19,7 +19,7 @@ class Blob(object):
         self.angle = random.uniform(0,np.pi)
         self.MAX_VELOCITY = 5
         self.energy = 1000
-        self.MAX_ENERGY = 200
+        self.MAX_ENERGY = 1000
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
@@ -85,13 +85,13 @@ class Blob(object):
         deltaX = self.target.center_x - self.center_x
         deltaY = self.target.center_y - self.center_y
         totalDistance = np.hypot(deltaX, deltaY)
-
+        energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
         change_angle = (SCREEN_SIZE[0]/2) * (self.angle - np.arctan2(deltaY, deltaX))
 
         env = np.array([
             totalDistance,
             change_angle,
-            self.energy
+            energy_input
             ])
         return self.nn.process(env)
 
