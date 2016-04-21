@@ -69,8 +69,8 @@ class Blob(object):
             addition, update attribute self.dist_moved for scoring related
             purposes
         """
-        self.center_x += (1 + deltaDist)**2 * np.cos(self.angle)
-        self.center_y += (1 + deltaDist)**2 * np.sin(self.angle)
+        self.center_x += deltaDist * np.cos(self.angle)
+        self.center_y += deltaDist * np.sin(self.angle)
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
