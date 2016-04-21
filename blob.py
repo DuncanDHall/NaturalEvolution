@@ -25,6 +25,9 @@ class Blob(object):
         self.score_int = 0
         self.target = target
 
+        #testing
+        self.color = int(self.energy / 4 + 5)
+
         # Neural Network stuff here:
         if nn is not None:
             self.nn = nn
@@ -146,12 +149,14 @@ class Blob(object):
                     del model.blobs[np.argmin(energy_list)]
 
 
-
     def score(self):
         """ score is the scoring / fitness function.  Try to make as simple as
             possible while still getting interesting behavior
         """
         return self.food_eaten
+
+    def update_color(self):
+        self.color = int(self.energy / 4 + 5)
 
 
     def update(self, model):
@@ -168,6 +173,8 @@ class Blob(object):
         self.update_position(dist_mag)
 
         self.update_energy(model, dist_mag, angle_mag)
+
+        self.update_color()
 
         self.eat_food(model)
 

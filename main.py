@@ -32,7 +32,7 @@ class PyGameView(object):
             if blob.alive:
                 pygame.draw.circle(
                     self.screen,
-                    pygame.Color('white'),
+                    pygame.Color(blob.color, blob.color, blob.color),
                     blob.int_center,
                     blob.radius
                     )
