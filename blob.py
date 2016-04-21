@@ -24,8 +24,11 @@ class Blob(object):
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
+        self.sight_radius = 150
+        self.sight_angle = math.pi / 3
 
-        #testing
+        #scoring related
+        self.dist_moved = 0
         self.color = int(self.energy / 4 + 5)
 
         # Neural Network stuff here:
@@ -74,12 +77,12 @@ class Blob(object):
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
-
     def update_angle(self, delta_angle):
         """ update_angle changes the angle based on an output from the neural
             net.
         """
         self.angle += delta_angle
+
 
 
     def process_neural_net(self):
@@ -116,6 +119,30 @@ class Blob(object):
             model.blobs.remove(self)
 
 
+    def get_food_within_sight(self, model):
+        closest_x = 0
+        closest_y = 0
+        closest_distance = 10000
+        #iterate through all food
+        for food in model.foods:
+            x = food.center_x
+            y = food.center_y
+            distance = math.sqrt((self.center_x - x)**2 + (self.center_y - y)**2)
+            #checks if food is within blob's radius of sight
+            if (distance < self.sight_radius):
+
+                theta = math.atan((y - self.center_y) / (x - self.center_x + 0.0001))
+                #checks if food is within the blob's angle of sight
+                if math.fabs(theta - self.angle) < self.sight_angle:
+                    #if this is the closest food
+                    if distance < closest_distance:
+                        closest_x = x
+                        closest_y = y
+        if closest_x > 0:
+            return (closest_x, closest_y)
+        #if no food is found, return a random value to move towards
+        return (random.randint(0, 500), random.randint(0, 500))
+
     def eat_food(self, model):
         """ eat_food tests whether or not a blob eats food on a given frame.
             If a blobl eats food, add to the blobs energy and remove the food.
@@ -128,12 +155,14 @@ class Blob(object):
             if self.intersect(f): #where is this global f defined
                 self.food_eaten += 1
                 self.energy += 500
+
                 if self.energy > self.MAX_ENERGY:
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
 
                 # global SCREEN_SIZE
+
                 model.foods.append(Food())
 
                 model.blobs.append(Blob(model.foods[0], self.nn))

@@ -5,13 +5,17 @@ import time
 from pygame.locals import QUIT, KEYDOWN
 from random import choice
 import numpy as np
-
+#test
 SCREEN_SIZE = (500, 500)
 FOOD_NUM = 1
 BLOB_NUM = 10
 SIM_SKIP_NUM = 100  # the number of simulations you want to skip
 NUM_PARENTS = 2
+<<<<<<< HEAD:nn_simple.py
+NUM_NODES = 2
+=======
 
+>>>>>>> 7bebd72e5025c71e841eff6468c4709d3bd89a75:Old/nn_polar.py
 
 MUTATION_RATE = 0.2
 MUTATION_AMOUNT = 0.5
@@ -122,6 +126,11 @@ class NN(object):
             the agent and a single food entity.
             parents_NN should be passed in as a tuple of NN objects
         """
+<<<<<<< HEAD:nn_simple.py
+        if parents_NN is not None:
+            self.W1, self.W2 = self.have_sex(parents_NN)
+=======
+>>>>>>> 7bebd72e5025c71e841eff6468c4709d3bd89a75:Old/nn_polar.py
 
         self.inputLayerSize = 3
         self.outputLayerSize = 5
@@ -135,6 +144,34 @@ class NN(object):
 
     def get_recombine(self, parents_NN):
         new_W_list = []
+<<<<<<< HEAD:nn_simple.py
+        #pool_W1 = [parent.W1 for parent in parents_NN]
+        #pool_W2 = [parent.W2 for parent in parents_NN]
+        pool_Ws = (pool_W1, pool_W2)
+
+        print pool_W1
+        return pool_W1, pool_W2
+
+        """for i in range(0, len(parent)):
+        	for j in range()
+        for i in range(parents)NN
+        for i, W in enumerate[W1, W2]:
+            new_W_list.append(weights)"""
+
+
+        # for W_parent1, W_parent2 in [(nn_1.W1, nn_2.W1), (nn_1.W2, nn_2.W2)]:
+        #     dim1 = shape(W_parent1)
+        #     dim2 = shape(W_parent2)
+        #     if dim1 != dim2:
+        #         raise ValueError
+        #     new_W = np.zeros(dim1)
+        #     for r in dim1[0]:
+        #         for c in dim1[1]:
+        #             new_W[r][c] = random.choice(
+        #                 W_parent1[r, c], W_parent2[r][c])
+        #     new_W_list.append(new_W)
+        # return tuple(new_W_list)
+=======
 
         list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
 
@@ -157,6 +194,7 @@ class NN(object):
         if np.random.rand() < MUTATION_RATE:
             return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
         return 0
+>>>>>>> 7bebd72e5025c71e841eff6468c4709d3bd89a75:Old/nn_polar.py
 
     def process(self, z1):
         """ propigates the signal through the neural network """

@@ -42,7 +42,18 @@ class PyGameView(object):
                     blob.int_center, 
                     (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
                     1)
-
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color('green'),
+                    blob.int_center,
+                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
+                    1)
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color('green'),
+                    blob.int_center,
+                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
+                    1)
         # draw food
         for food in self.model.foods:
             pygame.draw.circle(
@@ -126,9 +137,7 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         return True
-
-
-
+        
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
