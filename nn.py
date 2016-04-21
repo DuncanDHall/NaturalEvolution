@@ -25,6 +25,8 @@ class NN(object):
             self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
     def get_recombine(self, parents_NN):
+        """ Natural evolution isn't working.  When nn is passed in from blob.eat_food, it experiences no mutation.
+        """
         new_W_list = []
 
         list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
