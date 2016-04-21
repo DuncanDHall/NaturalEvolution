@@ -134,11 +134,7 @@ class Blob(object):
                 del model.foods[i]
 
                 # global SCREEN_SIZE
-                model.foods.append(
-                    Food(
-                        random.randint(10, SCREEN_SIZE[0]-10),
-                        random.randint(10, SCREEN_SIZE[1]-10),
-                        random.randint(5, 10)))
+                model.foods.append(Food())
 
                 model.blobs.append(Blob(model.foods[0], self.nn))
 

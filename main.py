@@ -71,16 +71,14 @@ class Model(object):
         # create foods
         for i in range(0, FOOD_NUM):
             x, y = (d/2 for d in SCREEN_SIZE)
-            border = 20
-            x = random.randint(0 + border, SCREEN_SIZE[0] - border)
-            y = random.randint(0 + border, SCREEN_SIZE[1] - border)
-            radius = random.randint(5, 10)
-            self.foods.append(Food(x, y, radius))
+            # border = 20
+            # x = random.randint(0 + border, SCREEN_SIZE[0] - border)
+            # y = random.randint(0 + border, SCREEN_SIZE[1] - border)
+            # radius = random.randint(5, 10)
+            self.foods.append(Food())
 
         # create blobs
         for i in range(0, BLOB_NUM):
-            x = random.randint(0, SCREEN_SIZE[0])
-            y = random.randint(0, SCREEN_SIZE[1])
             self.blobs.append(Blob(self.foods[0]))
 
     def update(self):
