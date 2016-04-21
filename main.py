@@ -7,7 +7,6 @@ from food import *
 from blob import *
 from constants import *
 
-
 class PyGameView(object):
     """ Provides a view of the environment in a pygame
         window """

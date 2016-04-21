@@ -1,166 +1,66 @@
-import pygame
+import numpy as np
+from constants import *
 import random
-import time
-from pygame.locals import QUIT, KEYDOWN
-from constants import *
-from food import *
-from blob import *
-from constants import *
 
 
-class PyGameView(object):
-    """ Provides a view of the environment in a pygame
-        window """
-    def __init__(self, model, size):
-        """ Initialize with the specified model """
-        self.model = model
-        self.screen = pygame.display.set_mode(size)
-
-    def draw(self):
-        """ Draw the simulation to the pygame window """
-        # fill background
-        self.screen.fill(pygame.Color('black'))
-
-        # draw generation number
-        basicfont = pygame.font.SysFont(None, 48)
-        sim_num_string = basicfont.render(
-            str(self.model.generation), True, (255, 255, 255))
-        self.screen.blit(sim_num_string, (1, 1))
-
-        # draw blobs
-        for blob in self.model.blobs:
-            if blob.alive:
-                pygame.draw.circle(
-                    self.screen,
-                    pygame.Color('white'),
-                    blob.int_center,
-                    blob.radius
-                    )
-                pygame.draw.line(
-                    self.screen, 
-                    pygame.Color('red'), 
-                    blob.int_center, 
-                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
-                    1)
-                pygame.draw.line(
-                    self.screen,
-                    pygame.Color('green'),
-                    blob.int_center,
-                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
-                    1)
-                pygame.draw.line(
-                    self.screen,
-                    pygame.Color('green'),
-                    blob.int_center,
-                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
-                    1)
-        # draw food
-        for food in self.model.foods:
-            pygame.draw.circle(
-                self.screen,
-                pygame.Color('orange'),
-                (food.center_x, food.center_y),
-                food.radius
-                )
-
-        pygame.display.update()
+class NN(object):
+    """ Represents the Neural Network of a blob 
+    """
 
 
-class Model(object):
-    """ Represents the state of all entities in the environment"""
-    def __init__(self, width, height):
-        self.height = height
-        self.width = width
+    def __init__(self, parents_NN=None):
+        """ this neural network takes in the distance and relative angle between
+            the blob and it's target food
+            parents_NN should be passed in as a tuple of NN objects
+        """
 
-        self.blobs = []
-        self.foods = []
-        self.vip_genes = []
-        self.generation = 0
+        self.inputLayerSize = 2
+        self.outputLayerSize = 2
+        self.hiddenLayerSize = 4
 
-        self.show_gen = True
+        if parents_NN is not None:
+            self.W1, self.W2 = self.get_recombine(parents_NN)
+        else:
+            self.W1 = np.random.uniform(-1, 1, (self.inputLayerSize, self.hiddenLayerSize))
+            self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
-        # create foods
-        for i in range(0, FOOD_NUM):
-            x, y = (d/2 for d in SCREEN_SIZE)
-            border = 20
-            x = random.randint(0 + border, SCREEN_SIZE[0] - border)
-            y = random.randint(0 + border, SCREEN_SIZE[1] - border)
-            radius = random.randint(5, 10)
-            self.foods.append(Food(x, y, radius))
+    def get_recombine(self, parents_NN):
+        new_W_list = []
 
-        # create blobs
-        for i in range(0, BLOB_NUM):
-            x = random.randint(0, SCREEN_SIZE[0])
-            y = random.randint(0, SCREEN_SIZE[1])
-            self.blobs.append(Blob(self.foods[0]))
+        list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
 
-    def update(self):
-        """ Update the model state """
-        for blob in reversed(self.blobs):
-            blob.update(self)
+        for W_parents in zip(*list_ws):
+            dim = W_parents[0].shape
+ 
+            for w_par in W_parents:
+                if w_par.shape != dim:
+                    raise ValueError
+            new_W = np.zeros(dim)
+            for r in range(dim[0]):
+                for c in range(dim[1]):
+                    new_W[r][c] = random.choice(
+                        [n[r][c] for n in W_parents]) + \
+                        self.get_mutation()
+            new_W_list.append(new_W)
+        return tuple(new_W_list)
 
-        # If all blobs are dead, start new cycle
-        if self.blobs == []:
-            self.create_generation(NUM_PARENTS)
+    def get_mutation(self):
+        if np.random.rand() < MUTATION_RATE:
+            return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
+        return 0
 
-            self.vip_genes = []
-            self.generation += 1
-            if self.generation % 10 == 0:
-                print 'generation {} complete'.format(self.generation)
+    def process(self, z1):
+        """ propigates the signal through the neural network """
+        # input and output to level 2 (nodes)
+        z2 = z1.dot(self.W1)
+        a2 = self.sigmoid(z2)
+        # input and output to level 3 (results)
+        z3 = a2.dot(self.W2)
+        a3 = self.sigmoid(z3)
 
-    def create_generation(self, num_winners=2):
-        """ Handles gene mutation and recombination"""
-        top_scoring = sorted(self.vip_genes, reverse=True)[:num_winners]
+        return [a3[0], a3[1]]
 
-        for i in range(0, BLOB_NUM):
-            new_NN = NN(parents_NN=top_scoring)
-            # TODO: Check if dna results are the blobs or others >> hmm?
-            self.blobs.append(Blob(self.foods[0], new_NN))
-
-
-class PyGameKeyboardController(object):
-    def __init__(self, model):
-        self.model = model
-
-    def handle_event(self, event):
-        """ Look for left and right keypresses to
-            modify the x position of the paddle """
-        if event.type != KEYDOWN:
-            return True
-        if event.key == pygame.K_SPACE:
-            return False
-        if event.key == pygame.K_d:
-            for tup in sorted(model.vip_genes)[-2:]:
-                print tup
-        if event.key == pygame.K_k:
-            for blob in model.blobs:
-                blob.energy = 0
-        if event.key == pygame.K_s:
-            model.show_gen = not model.show_gen
-        return True
-
-
-if __name__ == '__main__':
-    pygame.init()
-    size = SCREEN_SIZE
-
-    model = Model(size[0], size[1])
-    view = PyGameView(model, size)
-    controller = PyGameKeyboardController(model)
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                runnbing = False
-            else:
-                # handle event can end pygame loop
-                if not controller.handle_event(event):
-                    running = False
-        model.update()
-        if model.show_gen:
-            view.draw()
-            time.sleep(.005)
-
-    # nn = NN()
-    # z1 = np.array([-1, 1])
-    # print nn.process(z1)
+    def sigmoid(self, z):
+        # Apply sigmoid activation function
+        # -.5 allows negative values for proper angle rotations
+        return (1/(1+np.exp(-z))) - .5
