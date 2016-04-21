@@ -50,7 +50,8 @@ class NN(object):
         return 0
 
     def process(self, z1):
-        """ propigates the signal through the neural network """
+        """ propigates the signal through the neural network. a3[0] refers to distance, a3[1] refers to angle
+        """
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
         a2 = self.sigmoid(z2)
@@ -58,9 +59,9 @@ class NN(object):
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
 
-        return [a3[0], a3[1]]
+        return [a3[0] * 5, a3[1] * 0.2]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
 
     def sigmoid(self, z):
         # Apply sigmoid activation function
         # -.5 allows negative values for proper angle rotations
-        return (1/(1+np.exp(-z))) - .5
+        return ((1/(1+np.exp(-z))) - .5)

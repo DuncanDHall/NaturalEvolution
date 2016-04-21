@@ -155,6 +155,7 @@ class Blob(object):
         """ score is the scoring / fitness function.  Try to make as simple as
             possible while still getting interesting behavior
         """
+        return self.food_eaten
         return self.dist_moved * (1 + self.food_eaten)
 
 
