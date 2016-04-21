@@ -127,7 +127,7 @@ class Blob(object):
             f = model.foods[i]
             if self.intersect(f): #where is this global f defined
                 self.food_eaten += 1
-                self.energy += 200
+                self.energy += 500
                 if self.energy > self.MAX_ENERGY:
                     self.energy = self.MAX_ENERGY
 
