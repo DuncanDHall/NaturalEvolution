@@ -70,11 +70,6 @@ class Model(object):
 
         # create foods
         for i in range(0, FOOD_NUM):
-            x, y = (d/2 for d in SCREEN_SIZE)
-            # border = 20
-            # x = random.randint(0 + border, SCREEN_SIZE[0] - border)
-            # y = random.randint(0 + border, SCREEN_SIZE[1] - border)
-            # radius = random.randint(5, 10)
             self.foods.append(Food())
 
         # create blobs
