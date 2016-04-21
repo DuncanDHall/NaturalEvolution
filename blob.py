@@ -18,15 +18,12 @@ class Blob(object):
         self.radius = random.randint(5, 10)
         self.angle = random.uniform(0,np.pi)
         self.MAX_VELOCITY = 5
-        self.energy = 100
+        self.energy = 1000
         self.MAX_ENERGY = 200
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
-
-        #scoring related
-        self.dist_moved = 0
 
         # Neural Network stuff here:
         if nn is not None:
@@ -74,9 +71,6 @@ class Blob(object):
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
-        #update scoring
-        self.dist_moved += deltaDist
-
 
     def update_angle(self, delta_angle):
         """ update_angle changes the angle based on an output from the neural
@@ -96,19 +90,21 @@ class Blob(object):
 
         env = np.array([
             totalDistance,
-            change_angle
+            change_angle,
+            self.energy
             ])
         return self.nn.process(env)
 
 
-    def is_alive(self, model):
+    def update_energy(self, model, deltaDist, delta_angle):
         """ is_alive updates the energy of the blob based on a constant value.
             If the energy drops below zero, then remove the blob and add it
             score the model.vip_genes list.
 
             TODO: make blob lose energy based on distance moved
         """
-        self.energy -= .1
+        #subtract evergy based on distance moved
+        self.energy -= np.abs(deltaDist) + 1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -128,7 +124,7 @@ class Blob(object):
             f = model.foods[i]
             if self.intersect(f): #where is this global f defined
                 self.food_eaten += 1
-                self.energy += 50
+                self.energy += 200
                 if self.energy > self.MAX_ENERGY:
                     self.energy = self.MAX_ENERGY
 
@@ -156,7 +152,6 @@ class Blob(object):
             possible while still getting interesting behavior
         """
         return self.food_eaten
-        return self.dist_moved * (1 + self.food_eaten)
 
 
     def update(self, model):
@@ -172,7 +167,7 @@ class Blob(object):
 
         self.update_position(dist_mag)
 
-        self.is_alive(model)
+        self.update_energy(model, dist_mag, angle_mag)
 
         self.eat_food(model)
 

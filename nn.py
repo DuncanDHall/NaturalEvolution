@@ -14,7 +14,7 @@ class NN(object):
             parents_NN should be passed in as a tuple of NN objects
         """
 
-        self.inputLayerSize = 2
+        self.inputLayerSize = 3
         self.outputLayerSize = 2
         self.hiddenLayerSize = 4
 
@@ -59,7 +59,7 @@ class NN(object):
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
 
-        return [a3[0] * 5, a3[1] * 0.2]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
+        return [a3[0] * 5, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
 
     def sigmoid(self, z):
         # Apply sigmoid activation function
