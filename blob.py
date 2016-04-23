@@ -210,7 +210,7 @@ class Blob(ParentSprite):
         self.eat_food(model)
 
         #define target
-        foods_in_sight = self.get_things_within_sight(model.foods)[0]
+        foods_in_sight = self.get_things_within_sight(model.foods)
         if len(foods_in_sight) > 0:
             self.target = foods_in_sight[0]
         else:
