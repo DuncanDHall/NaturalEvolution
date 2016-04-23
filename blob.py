@@ -87,19 +87,20 @@ class Blob(object):
         """
         deltaX = self.target.center_x - self.center_x
         deltaY = self.target.center_y - self.center_y
-        totalDistance = np.hypot(deltaX, deltaY)
+
+        total_distance = np.hypot(deltaX, deltaY)
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
-        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - np.arctan2(deltaY, deltaX)) #make sure deltaY and deltaX are floats. try math atan2
+        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaY, deltaX)) #make sure deltaY and deltaX are floats. try math atan2
 
         env = np.array([
-            totalDistance,
+            total_distance,
             change_angle,
             energy_input
             ])
         return self.nn.process(env)
 
 
-    def update_energy(self, model, deltaDist, delta_angle):
+    def update_energy(self, model, deltaDist, deltaAngle):
         """ is_alive updates the energy of the blob based on a constant value.
             If the energy drops below zero, then remove the blob and add it
             score the model.vip_genes list.
@@ -107,7 +108,7 @@ class Blob(object):
             TODO: make blob lose energy based on distance moved
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(deltaDist) + 1
+        self.energy -= np.abs(deltaDist) + .1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
