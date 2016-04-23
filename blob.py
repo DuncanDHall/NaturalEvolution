@@ -24,6 +24,9 @@ class Blob(object):
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
+        #TODO: make these two part of the genes
+        self.vision_mag = random.randint(100, 200)
+        self.vision_angle = random.random()*math.pi/2.0
 
         #scoring related
         self.dist_moved = 0
@@ -85,7 +88,7 @@ class Blob(object):
         self.angle += delta_angle
 
 
-    def process_neural_net(self):
+    def process_neural_net(self, model):
         """ create environment and process through neural net brain
         """
         deltaX = self.target.center_x - self.center_x
