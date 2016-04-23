@@ -15,6 +15,7 @@ class Blob(ParentSprite):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
+        super(Blob, self).__init__(0, 0) #values are not needed
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
         self.angle = random.uniform(0,np.pi)
@@ -41,13 +42,13 @@ class Blob(ParentSprite):
 
     def get_center_x(self):
         """Gets the x coordinate of the center"""
+        #return a random value within constants screen size
         return self.center_x
-        
 
     def get_center_y(self):
         """Gets the y coordinate of the center"""
+        #return a random value within constants screen size
         return self.center_y
-
 
     def out_of_bounds(self):
         """ moves the blob to the other side of the screen if it moves out of 
@@ -214,5 +215,8 @@ class Blob(ParentSprite):
         if len(foods_in_sight) > 0:
             self.target = foods_in_sight[0]
         else:
-            #generic point on the screen
-            self.target = ParentSprite()
+            #random point on screen
+            #not sure if x corresponds to screen_size[0] and y to screen_size[1]
+            randx = (self.center_x+random.randint(0, SCREEN_SIZE[0]))%SCREEN_SIZE[0]
+            randy = (self.center_y+random.randint(0, SCREEN_SIZE[1]))%SCREEN_SIZE[1]
+            self.target = ParentSprite(randx, randy)

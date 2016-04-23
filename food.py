@@ -9,15 +9,9 @@ class Food(ParentSprite):
         border = 20
         self.center_x = random.randint(0 + border, SCREEN_SIZE[0] - border)
         self.center_y = random.randint(0 + border, SCREEN_SIZE[1] - border)
+        super(Food, self).__init__(self.center_x, self.center_y)
         self.radius = random.randint(5, 10)
         #don't use color right now.  Maybe in the future change blobs to
         #color of food that they are tracking
         # self.color = color
         self.eaten = False
-    def get_center_x(self):
-        """Gets the x coordinate of the center"""
-        return self.center_x
-        
-    def get_center_y(self):
-        """Gets the y coordinate of the center"""
-        return self.center_y

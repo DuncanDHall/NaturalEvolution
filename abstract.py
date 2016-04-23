@@ -4,15 +4,19 @@ from constants import *
 
 class ParentSprite(object):
 
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
     def get_center_x(self):
         """Gets the x coordinate of the center"""
         #return a random value within constants screen size
-        return random.randint(0, SCREEN_SIZE[0]) # or is it 1????
+        return self.x
 
     def get_center_y(self):
         """Gets the y coordinate of the center"""
         #return a random value within constants screen size
-        return random.randint(0, SCREEN_SIZE[1]) #or is is 0..see above method
+        return self.y
 
     def get_dist(self, other):
         """ 
