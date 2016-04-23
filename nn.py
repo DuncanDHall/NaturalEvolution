@@ -14,7 +14,7 @@ class NN(object):
             parents_NN should be passed in as a tuple of NN objects
         """
 
-        self.inputLayerSize = 2
+        self.inputLayerSize = 3
         self.outputLayerSize = 2
         self.hiddenLayerSize = 4
 
@@ -25,6 +25,8 @@ class NN(object):
             self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
     def get_recombine(self, parents_NN):
+        """ Natural evolution isn't working.  When nn is passed in from blob.eat_food, it experiences no mutation.
+        """
         new_W_list = []
 
         list_ws = [(n[1].W1, n[1].W2) for n in parents_NN]
@@ -50,7 +52,8 @@ class NN(object):
         return 0
 
     def process(self, z1):
-        """ propigates the signal through the neural network """
+        """ propigates the signal through the neural network. a3[0] refers to distance, a3[1] refers to angle
+        """
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
         a2 = self.sigmoid(z2)
@@ -58,9 +61,10 @@ class NN(object):
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
 
-        return [a3[0], a3[1]]
+        return [a3[0] * 5, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
+
 
     def sigmoid(self, z):
         # Apply sigmoid activation function
         # -.5 allows negative values for proper angle rotations
-        return (1/(1+np.exp(-z))) - .5
+        return ((1/(1+np.exp(-z))) - .5)

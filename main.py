@@ -32,7 +32,7 @@ class PyGameView(object):
             if blob.alive:
                 pygame.draw.circle(
                     self.screen,
-                    pygame.Color('white'),
+                    pygame.Color(blob.color, blob.color, blob.color),
                     blob.int_center,
                     blob.radius
                     )
@@ -42,7 +42,18 @@ class PyGameView(object):
                     blob.int_center, 
                     (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
                     1)
-
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color('green'),
+                    blob.int_center,
+                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
+                    1)
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color('green'),
+                    blob.int_center,
+                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
+                    1)
         # draw food
         for food in self.model.foods:
             pygame.draw.circle(
@@ -70,17 +81,10 @@ class Model(object):
 
         # create foods
         for i in range(0, FOOD_NUM):
-            x, y = (d/2 for d in SCREEN_SIZE)
-            border = 20
-            x = random.randint(0 + border, SCREEN_SIZE[0] - border)
-            y = random.randint(0 + border, SCREEN_SIZE[1] - border)
-            radius = random.randint(5, 10)
-            self.foods.append(Food(x, y, radius))
+            self.foods.append(Food())
 
         # create blobs
         for i in range(0, BLOB_NUM):
-            x = random.randint(0, SCREEN_SIZE[0])
-            y = random.randint(0, SCREEN_SIZE[1])
             self.blobs.append(Blob(self.foods[0]))
 
     def update(self):
@@ -119,16 +123,21 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_SPACE:
             return False
         if event.key == pygame.K_d:
-            for tup in sorted(model.vip_genes)[-2:]:
-                print tup
+            for blob in model.blobs:
+                print 'W1 is'
+                print blob.nn.W1
+                print ""
+                print "W2 is"
+                print ""
+                print blob.nn.W2
+                # break #iterate through first thing in a list
         if event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
         if event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         return True
-
-
+        
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
