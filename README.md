@@ -6,6 +6,9 @@
 ####  Description:
 Natural Evolution is a simulation of a natural selection and speciation, using genetic algorithms and neural networks.  It shows the evolution of organisms that eat food and reproduce “at will” (through neural networks).
 
+The simulation is run on Pygame, and the organisms make decisions using neural networks.
+To change the behavior of the simulation, change the constants in 'constants.py' .
+
 #### Dependencies
 * Python 2.7
 * Pygame 1.9.1 – [get it](http://www.pygame.org/wiki/GettingStarted)
