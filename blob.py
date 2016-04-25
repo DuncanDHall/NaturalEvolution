@@ -85,11 +85,12 @@ class Blob(object):
 
 
 
-    def process_neural_net(self):
+    def process_neural_net(self, model):
         """ create environment and process through neural net brain
         """
-        deltaX = self.target.center_x - self.center_x
-        deltaY = self.target.center_y - self.center_y
+        (target_x, target_y) = self.get_food_within_sight(model)
+        deltaX = target_x - self.center_x
+        deltaY = target_y - self.center_y
         totalDistance = np.hypot(deltaX, deltaY)
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
         change_angle = (SCREEN_SIZE[0]/2) * (self.angle - np.arctan2(deltaY, deltaX))
@@ -191,7 +192,7 @@ class Blob(object):
             TODO: make the food targeting a function.
         """
 
-        [dist_mag, angle_mag] = self.process_neural_net()
+        [dist_mag, angle_mag] = self.process_neural_net(model)
 
         self.update_angle(angle_mag)
 
