@@ -51,6 +51,7 @@ class Blob(object):
         """ moves the blob to the other side of the screen if it moves out of 
             bounds.  It will also make sure angle is between 0 and 2pi 
         """
+        # #wrap around
         # if self.center_x<0:
         #     self.center_x=int(SCREEN_SIZE[0])+self.center_x
         # if self.center_x>SCREEN_SIZE[0]:
@@ -60,6 +61,18 @@ class Blob(object):
         #     self.center_y=int(SCREEN_SIZE[1])+self.center_y
         # if self.center_y>SCREEN_SIZE[1]:
         #     self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
+
+        #stop at edge
+        if self.center_x<0:
+            self.center_x=0
+        if self.center_x>SCREEN_SIZE[0]:
+            self.center_x=SCREEN_SIZE[0]
+
+        if self.center_y <0:
+            self.center_y=0
+        if self.center_y>SCREEN_SIZE[1]:
+            self.center_y=SCREEN_SIZE[1]
+
 
         if self.angle > 2*np.pi:
             self.angle = self.angle % np.pi
@@ -119,9 +132,10 @@ class Blob(object):
             model.blobs.remove(self)
 
 
-    def get_food_within_sight(self, model):
+    def get_food_within_sight(self, model, current_blob):
         closest_x = 0
         closest_y = 0
+        closest_food = current_blob
         closest_distance = 10000
         #iterate through all food
         for food in model.foods:
@@ -138,10 +152,11 @@ class Blob(object):
                     if distance < closest_distance:
                         closest_x = x
                         closest_y = y
-        if closest_x > 0:
-            return (closest_x, closest_y)
-        #if no food is found, return a random value to move towards
-        return (random.randint(0, 500), random.randint(0, 500))
+                        closest_food = food
+
+        self.target = closest_food
+
+
 
     def eat_food(self, model):
         """ eat_food tests whether or not a blob eats food on a given frame.
@@ -180,11 +195,12 @@ class Blob(object):
         """
         return self.food_eaten
 
+
     def update_color(self):
         self.color = int(self.energy / 4 + 5)
 
 
-    def update(self, model):
+    def update(self, model, current_blob):
         """ Update the all aspects of blob based on neural net decisions. Also
             assign next food target.  
 
@@ -203,4 +219,4 @@ class Blob(object):
 
         self.eat_food(model)
 
-        self.target = model.foods[0]
+        self.get_food_within_sight(model, current_blob)
