@@ -4,6 +4,7 @@ import random
 import time
 from pygame.locals import QUIT, KEYDOWN
 from random import choice
+from math import pi, sin, cos, atan
 import numpy as np
 #test
 SCREEN_SIZE = (500, 500)

@@ -1,12 +1,13 @@
 from constants import *
 from food import *
+from abstract import ParentSprite
 import random
 from nn import NN
 import numpy as np
 import math
 
 
-class Blob(object):
+class Blob(ParentSprite):
     """ Represents a ball in my natural evolution simulation """
 
 
@@ -14,6 +15,7 @@ class Blob(object):
         """ Create a ball object with the specified geometry """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
+        super(Blob, self).__init__(0, 0) #values are not needed
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
         self.angle = random.uniform(0,np.pi)
@@ -24,6 +26,7 @@ class Blob(object):
         self.food_eaten = 0
         self.score_int = 0
         self.target = target
+        #TODO: make these two part of the genes
         self.sight_radius = 150
         self.sight_angle = math.pi / 3
 
@@ -37,15 +40,15 @@ class Blob(object):
         else:
             self.nn = NN()
 
+    def get_center_x(self):
+        """Gets the x coordinate of the center"""
+        #return a random value within constants screen size
+        return self.center_x
 
-    def intersect(self, other):
-        """ tells whether or not two objects are intersecting.  
-            This will primarily be used to determine if a blob eats food
-        """
-        dist = abs(np.hypot(
-            self.center_x-other.center_x, self.center_y-other.center_y))
-        return dist < self.radius + other.radius
-
+    def get_center_y(self):
+        """Gets the y coordinate of the center"""
+        #return a random value within constants screen size
+        return self.center_y
 
     def out_of_bounds(self):
         """ moves the blob to the other side of the screen if it moves out of 
@@ -84,15 +87,13 @@ class Blob(object):
         self.angle += delta_angle
 
 
-
     def process_neural_net(self):
         """ create environment and process through neural net brain
         """
-        deltaX = self.target.center_x - self.center_x
-        deltaY = self.target.center_y - self.center_y
-        totalDistance = np.hypot(deltaX, deltaY)
+        
+        totalDistance = self.get_dist(self.target)
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
-        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - np.arctan2(deltaY, deltaX)) #make sure deltaY and deltaX are floats. try math atan2
+        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target))
 
         env = np.array([
             totalDistance,
@@ -119,29 +120,37 @@ class Blob(object):
             model.blobs.remove(self)
 
 
-    def get_food_within_sight(self, model):
-        closest_x = 0
-        closest_y = 0
-        closest_distance = 10000
+    def get_things_within_sight(self, list_of_things):
+        in_sight = []
+        # closest_x = -1
+        # closest_y = -1
+        # closest_distance = 10000
         #iterate through all food
-        for food in model.foods:
-            x = food.center_x
-            y = food.center_y
-            distance = math.sqrt((self.center_x - x)**2 + (self.center_y - y)**2)
-            #checks if food is within blob's radius of sight
-            if (distance < self.sight_radius):
+        for thing in list_of_things:
+            x = thing.get_center_x()
+            y = thing.get_center_y()
+            distance = self.get_dist(thing)
+            #checks if thing is within blob's radius of sight, and not right on top of it
+            #right on top of itself is important when checking if other blobs are within sight
+            if (distance < self.sight_radius and distance > 0):
 
-                theta = math.atan((y - self.center_y) / (x - self.center_x + 0.0001))
+                theta = self.angle_between(thing)
                 #checks if food is within the blob's angle of sight
                 if math.fabs(theta - self.angle) < self.sight_angle:
+                    #within sight
+                    in_sight.append(thing)
                     #if this is the closest food
-                    if distance < closest_distance:
-                        closest_x = x
-                        closest_y = y
-        if closest_x > 0:
-            return (closest_x, closest_y)
-        #if no food is found, return a random value to move towards
-        return (random.randint(0, 500), random.randint(0, 500))
+                    # if distance < closest_distance:
+                    #     closest_x = x
+                    #     closest_y = y
+
+        # if closest_x >= 0:
+        #     return (closest_x, closest_y)
+        # #if no food is found, return a random value to move towards
+        # return (random.randint(0, 500), random.randint(0, 500))
+
+        #return all the things in the list that are within sight
+        return in_sight
 
     def eat_food(self, model):
         """ eat_food tests whether or not a blob eats food on a given frame.
@@ -152,7 +161,7 @@ class Blob(object):
         """
         for i in range(len(model.foods)-1, -1, -1):
             f = model.foods[i]
-            if self.intersect(f): #where is this global f defined
+            if self.intersect(f):
                 self.food_eaten += 1
                 self.energy += 500
 
@@ -160,9 +169,7 @@ class Blob(object):
                     self.energy = self.MAX_ENERGY
 
                 del model.foods[i]
-
-                # global SCREEN_SIZE
-
+                
                 model.foods.append(Food())
 
                 model.blobs.append(Blob(model.foods[0], self.nn))
@@ -203,4 +210,13 @@ class Blob(object):
 
         self.eat_food(model)
 
-        self.target = model.foods[0]
+        #define target
+        foods_in_sight = self.get_things_within_sight(model.foods)
+        if len(foods_in_sight) > 0:
+            self.target = foods_in_sight[0]
+        else:
+            #random point on screen
+            #not sure if x corresponds to screen_size[0] and y to screen_size[1]
+            randx = (self.center_x+random.randint(0, SCREEN_SIZE[0]))%SCREEN_SIZE[0]
+            randy = (self.center_y+random.randint(0, SCREEN_SIZE[1]))%SCREEN_SIZE[1]
+            self.target = ParentSprite(randx, randy)
