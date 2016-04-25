@@ -108,7 +108,7 @@ class Blob(object):
             TODO: make blob lose energy based on distance moved
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(deltaDist) + .1
+        self.energy -= np.abs(deltaDist) + 1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -155,6 +155,9 @@ class Blob(object):
     def update_color(self):
         self.color = int(self.energy / 4 + 5)
 
+    def target_closest_n_blobs(self, model):
+        for blob in model.blobs:
+            print blob
 
     def update(self, model):
         """ Update the all aspects of blob based on neural net decisions. Also
@@ -174,5 +177,7 @@ class Blob(object):
         self.update_color()
 
         self.eat_food(model)
+
+        self.target_closest_n_blobs(model)
 
         self.target = model.foods[0]

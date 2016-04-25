@@ -1,5 +1,5 @@
 SCREEN_SIZE = (500, 500)
-FOOD_NUM = 1
+FOOD_NUM = 2
 BLOB_NUM = 10
 # SIM_SKIP_NUM = 10  draw by toggling "s"
 NUM_PARENTS = 2
