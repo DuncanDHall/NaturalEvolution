@@ -90,7 +90,7 @@ class Model(object):
     def update(self):
         """ Update the model state """
         for blob in reversed(self.blobs):
-            blob.update(self)
+            blob.update(self, blob)
 
         # If all blobs are dead, start new cycle
         if self.blobs == []:
