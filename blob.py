@@ -36,7 +36,7 @@ class Blob(ParentSprite):
 
         # Neural Network stuff here:
         if nn is not None:
-            self.nn = NN(((1, nn),))
+            self.nn = nn
         else:
             self.nn = NN()
 
