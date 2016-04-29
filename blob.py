@@ -17,20 +17,21 @@ class Blob(object):
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
         self.angle = random.uniform(0,np.pi)
-        self.MAX_VELOCITY = 5
         self.energy = 1000
         self.MAX_ENERGY = 1000
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
-        self.target = target
+
+        self.target_blob = self
+        self.target_food = target
 
         #testing
         self.color = int(self.energy / 4 + 5)
 
         # Neural Network stuff here:
         if nn is not None:
-            self.nn = nn
+            self.nn = NN(((1, nn),))
         else:
             self.nn = NN()
 
@@ -85,17 +86,24 @@ class Blob(object):
     def process_neural_net(self):
         """ create environment and process through neural net brain
         """
-        deltaX = self.target.center_x - self.center_x
-        deltaY = self.target.center_y - self.center_y
+        deltaXfood = self.target_food.center_x - self.center_x
+        deltaYfood = self.target_food.center_y - self.center_y
 
-        total_distance = np.hypot(deltaX, deltaY)
+        total_distance_food = np.hypot(deltaXfood, deltaYfood)
+        change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaYfood, deltaXfood))
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
-        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaY, deltaX)) #make sure deltaY and deltaX are floats. try math atan2
+
+        deltaXblob = self.target_food.center_x - self.center_x
+        deltaYblob = self.target_food.center_y - self.center_y
+        total_distance_blob = np.hypot(deltaXblob, deltaYblob)
+        change_angle_blob = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaYblob, deltaXblob))
 
         env = np.array([
-            total_distance,
-            change_angle,
-            energy_input
+            total_distance_food,
+            change_angle_food,
+            energy_input,
+            total_distance_blob,
+            change_angle_blob
             ])
         return self.nn.process(env)
 
@@ -108,7 +116,7 @@ class Blob(object):
             TODO: make blob lose energy based on distance moved
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(deltaDist) + 1
+        self.energy -= np.abs(deltaDist) + .1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -152,12 +160,28 @@ class Blob(object):
         """
         return self.food_eaten
 
+
     def update_color(self):
         self.color = int(self.energy / 4 + 5)
 
-    def target_closest_n_blobs(self, model):
-        for blob in model.blobs:
-            print blob
+
+    def target_closest_blob(self, model):
+
+        rel_blobs = [[np.hypot(self.center_x - blob.center_x, self.center_y - blob.center_y), blob] for blob in model.blobs]
+        rel_blobs.sort()
+
+        if len(rel_blobs) > 1:
+            self.target_blob = rel_blobs[1][1] #get second smallest distance
+        else:
+            self.target_blob = self
+
+
+    def target_closest_food(self, model):
+
+        rel_food = [[np.hypot(self.center_x - food.center_x, self.center_y - food.center_y), food] for food in model.foods]
+        rel_food.sort()
+        self.target_food = rel_food[0][1]
+
 
     def update(self, model):
         """ Update the all aspects of blob based on neural net decisions. Also
@@ -178,6 +202,6 @@ class Blob(object):
 
         self.eat_food(model)
 
-        self.target_closest_n_blobs(model)
+        self.target_closest_blob(model)
 
-        self.target = model.foods[0]
+        self.target_closest_food(model)
