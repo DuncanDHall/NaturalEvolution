@@ -19,3 +19,6 @@ CONTROLS = [
     "    , = slow down simulation",
     "    h = toggle help"
 ]
+
+MATERNITY_LEAVE = 200
+MAX_ENERGY = 1000

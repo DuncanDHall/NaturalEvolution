@@ -18,13 +18,11 @@ class Blob(ParentSprite):
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = 15
         self.angle = random.uniform(0,np.pi)
-        self.energy = 1000
-        self.MAX_ENERGY = 1000
+        self.energy = MAX_ENERGY
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
         self.maternity_leave = 0
-        self.MATERNITY = 10
 
         self.target_blob = self
         self.target_food = target
@@ -166,8 +164,8 @@ class Blob(ParentSprite):
                 self.food_eaten += 1
                 self.energy += 500
 
-                if self.energy > self.MAX_ENERGY:
-                    self.energy = self.MAX_ENERGY
+                if self.energy > MAX_ENERGY:
+                    self.energy = MAX_ENERGY
 
                 del model.foods[i]
                 
@@ -213,14 +211,14 @@ class Blob(ParentSprite):
 
     def interact(self, other_blob, model):
         """interaction"""
-        self.energy -= self.MAX_ENERGY/5
-        other_blob.energy -= other_blob.MAX_ENERGY/5
+        self.energy -= MAX_ENERGY/200
+        other_blob.energy -= MAX_ENERGY/200
         if (self.energy > 0 or other_blob.energy > 0) and self.maternity_leave <=0 and other_blob.maternity_leave<=0:
             neural_list = [(1, self.nn), (1, other_blob.nn)]
             child = Blob(ParentSprite(self.center_x, self.center_y), NN(neural_list))
             model.blobs.append(child)
-            self.maternity_leave = self.MATERNITY
-            other_blob.maternity_leave = other_blob.MATERNITY
+            self.maternity_leave = MATERNITY_LEAVE
+            other_blob.maternity_leave = MATERNITY_LEAVE
         
 
     def update(self, model):
