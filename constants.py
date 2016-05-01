@@ -5,7 +5,7 @@ BLOB_NUM = 10
 NUM_PARENTS = 2
 
 MUTATION_RATE = 0.2
-MUTATION_AMOUNT = 0.05
+MUTATION_AMOUNT = 0.5
 
 sleep = 0.05
 
@@ -19,3 +19,6 @@ CONTROLS = [
     "    , = slow down simulation",
     "    h = toggle help"
 ]
+
+MATERNITY_LEAVE = 200
+MAX_ENERGY = 1000

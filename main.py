@@ -93,6 +93,13 @@ class Model(object):
 
     def update(self):
         """ Update the model state """
+        for i in range(len(self.blobs)-1, 0, -1):
+            for j in range(i-1, -1, -1):
+                one = self.blobs[i]
+                two = self.blobs[j]
+                if one.intersect(two):
+                    one.interact(two, self)
+
         for blob in reversed(self.blobs):
             blob.update(self)
 
@@ -135,6 +142,7 @@ class PyGameKeyboardController(object):
                 print ""
                 print blob.nn.W2
                 # break #iterate through first thing in a list
+
         elif event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
