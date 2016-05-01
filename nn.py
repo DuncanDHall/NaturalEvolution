@@ -16,7 +16,7 @@ class NN(object):
 
         self.inputLayerSize = 5
         self.outputLayerSize = 2
-        self.hiddenLayerSize = 4
+        self.hiddenLayerSize = 2
 
         if parents_NN is not None:
             self.W1, self.W2 = self.get_recombine(parents_NN)

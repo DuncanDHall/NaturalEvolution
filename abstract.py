@@ -24,7 +24,7 @@ class ParentSprite(object):
         Gets the distance between two abstract sprites
         """
         dist = np.hypot(
-            self.get_center_x()-other.get_center_x(), self.get_center_y()-other.get_center_y())
+            other.get_center_x()-self.get_center_x(), other.get_center_y()-self.get_center_y())
         return dist
 
     def intersect(self, other):
