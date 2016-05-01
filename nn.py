@@ -4,7 +4,7 @@ import random
 
 
 class NN(object):
-    """ Represents the Neural Network of a blob 
+    """ Represents the Neural Network of a blob
     """
 
 
@@ -25,7 +25,7 @@ class NN(object):
             self.W2 = np.random.uniform(-1, 1, (self.hiddenLayerSize, self.outputLayerSize))
 
     def get_recombine(self, parents_NN):
-        """ Natural evolution isn't working.  When nn is passed in from blob.eat_food, it experiences no mutation.
+        """ get_recombine mutates the neural network weights when a blob eats food or when the generation is over
         """
         new_W_list = []
 
@@ -33,7 +33,7 @@ class NN(object):
 
         for W_parents in zip(*list_ws):
             dim = W_parents[0].shape
- 
+
             for w_par in W_parents:
                 if w_par.shape != dim:
                     raise ValueError
@@ -60,8 +60,7 @@ class NN(object):
         # input and output to level 3 (results)
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
-
-        return [a3[0] * 15, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
+        return [a3[0] * 5, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
 
     def sigmoid(self, z):
         # Apply sigmoid activation function

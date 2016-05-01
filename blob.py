@@ -37,7 +37,7 @@ class Blob(object):
 
 
     def intersect(self, other):
-        """ tells whether or not two objects are intersecting.  
+        """ tells whether or not two objects are intersecting.
             This will primarily be used to determine if a blob eats food
         """
         dist = abs(np.hypot(
@@ -46,8 +46,8 @@ class Blob(object):
 
 
     def out_of_bounds(self):
-        """ moves the blob to the other side of the screen if it moves out of 
-            bounds.  It will also make sure angle is between 0 and 2pi 
+        """ moves the blob to the other side of the screen if it moves out of
+            bounds.  It will also make sure angle is between 0 and 2pi
         """
         # if self.center_x<0:
         #     self.center_x=int(SCREEN_SIZE[0])+self.center_x
@@ -60,10 +60,9 @@ class Blob(object):
         #     self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
 
         if self.angle > 2*np.pi:
-            self.angle = self.angle % np.pi
+            self.angle = self.angle % (1 * np.pi)
         if self.angle < -2*np.pi:
-            self.angle = -self.angle % np.pi 
-
+            self.angle = -self.angle % (1 * np.pi)
 
     def update_position(self, deltaDist):
         """ update_position based on an output from the neural net.  In
@@ -90,6 +89,11 @@ class Blob(object):
         deltaYfood = self.target_food.center_y - self.center_y
 
         total_distance_food = np.hypot(deltaXfood, deltaYfood)
+
+        if deltaYfood < .1:
+            print deltaYfood
+            print total_distance_food
+
         change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaYfood, deltaXfood))
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
 
@@ -185,7 +189,7 @@ class Blob(object):
 
     def update(self, model):
         """ Update the all aspects of blob based on neural net decisions. Also
-            assign next food target.  
+            assign next food target.
 
             TODO: make the food targeting a function.
         """

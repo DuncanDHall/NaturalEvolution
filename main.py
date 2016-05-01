@@ -37,10 +37,10 @@ class PyGameView(object):
                     blob.radius
                     )
                 pygame.draw.line(
-                    self.screen, 
-                    pygame.Color('red'), 
-                    blob.int_center, 
-                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
+                    self.screen,
+                    pygame.Color('red'),
+                    blob.int_center,
+                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)),
                     1)
 
         # draw food
@@ -48,7 +48,7 @@ class PyGameView(object):
             pygame.draw.circle(
                 self.screen,
                 pygame.Color('orange'),
-                (food.center_x, food.center_y),
+                food.int_center,
                 food.radius
                 )
 
@@ -123,6 +123,7 @@ class PyGameKeyboardController(object):
         if event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
+                break
         if event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         return True
@@ -148,7 +149,7 @@ if __name__ == '__main__':
         model.update()
         if model.show_gen:
             view.draw()
-            time.sleep(.002)
+            time.sleep(.0005)
 
     # nn = NN()
     # z1 = np.array([-1, 1])
