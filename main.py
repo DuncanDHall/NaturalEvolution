@@ -108,9 +108,9 @@ class PyGameKeyboardController(object):
             modify the x position of the paddle """
         if event.type != KEYDOWN:
             return True
-        if event.key == pygame.K_SPACE:
+        elif event.key == pygame.K_SPACE:
             return False
-        if event.key == pygame.K_d:
+        elif event.key == pygame.K_d:
             for blob in model.blobs:
                 print 'W1 is'
                 print blob.nn.W1
@@ -119,11 +119,18 @@ class PyGameKeyboardController(object):
                 print ""
                 print blob.nn.W2
                 # break #iterate through first thing in a list
-        if event.key == pygame.K_k:
+        elif event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
-        if event.key == pygame.K_s:
+        elif event.key == pygame.K_s:
             model.show_gen = not model.show_gen
+        elif event.key == pygame.K_PERIOD:
+            global SLEEP
+            SLEEP = max(SLEEP-0.02, 0.0)
+        elif event.key == pygame.K_COMMA:
+            global SLEEP
+            SLEEP += 0.02
+
         return True
         
 if __name__ == '__main__':
@@ -137,7 +144,7 @@ if __name__ == '__main__':
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
-                runnbing = False
+                running = False
             else:
                 # handle event can end pygame loop
                 if not controller.handle_event(event):
@@ -145,7 +152,7 @@ if __name__ == '__main__':
         model.update()
         if model.show_gen:
             view.draw()
-            time.sleep(.002)
+            time.sleep(SLEEP)
 
     # nn = NN()
     # z1 = np.array([-1, 1])
