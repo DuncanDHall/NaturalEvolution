@@ -1,7 +1,6 @@
 from constants import *
 from food import *
 from abstract import ParentSprite
-import random
 from nn import NN
 import numpy as np
 import math
@@ -149,7 +148,7 @@ class Blob(ParentSprite):
 
                 theta = self.angle_between(thing)
                 #checks if food is within the blob's angle of sight
-                if math.fabs(theta - self.angle) < self.sight_angle:
+                if np.fabs(theta) < self.sight_angle:
                     #within sight
                     in_sight.append(thing)
 
@@ -223,6 +222,6 @@ class Blob(ParentSprite):
         else:
             #random point on screen
             #not sure if x corresponds to screen_size[0] and y to screen_size[1]
-            randx = self.center_x
-            randy = self.center_y
+            randx = self.center_x - 20*np.cos(self.angle - 0.5)
+            randy = self.center_y + 20*np.sin(self.angle - 0.5)
             self.target = ParentSprite(randx, randy)

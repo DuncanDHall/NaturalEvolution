@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import random
 from constants import *
 
@@ -22,8 +23,8 @@ class ParentSprite(object):
         """ 
         Gets the distance between two abstract sprites
         """
-        dist = abs(math.hypot(
-            self.get_center_x()-other.get_center_x(), self.get_center_y()-other.get_center_y()))
+        dist = np.hypot(
+            self.get_center_x()-other.get_center_x(), self.get_center_y()-other.get_center_y())
         return dist
 
     def intersect(self, other):
