@@ -6,6 +6,7 @@ from constants import *
 from food import *
 from blob import *
 from constants import *
+import os
 
 
 class PyGameView(object):
@@ -16,16 +17,30 @@ class PyGameView(object):
         self.model = model
         self.screen = pygame.display.set_mode(size)
 
+    def draw_text(self, text, x, y, size, color=(100, 100, 100)):
+        """ helper to draw text (string input) onto screen at coords (x, y)
+            and specified font size and color
+        """
+        basicfont = pygame.font.SysFont(None, size)
+        text_render = basicfont.render(
+            text, True, color)
+        self.screen.blit(text_render, (x, y))
+
     def draw(self):
         """ Draw the simulation to the pygame window """
         # fill background
         self.screen.fill(pygame.Color('black'))
 
         # draw generation number
-        basicfont = pygame.font.SysFont(None, 48)
-        sim_num_string = basicfont.render(
-            str(self.model.generation), True, (255, 255, 255))
-        self.screen.blit(sim_num_string, (1, 1))
+        self.draw_text(str(self.model.generation), 1, 1, 48)
+
+        # draw controls helper
+        if model.show_key:
+            for n, line in enumerate(CONTROLS):
+                self.draw_text(line, 10, 50+14*n, 20)
+        else:
+            self.draw_text(
+                "h = toggle help", 30, 1, 20)
 
         # draw blobs
         for blob in self.model.blobs:
@@ -66,6 +81,7 @@ class Model(object):
         self.generation = 0
 
         self.show_gen = True
+        self.show_key = False
 
         # create foods
         for i in range(0, FOOD_NUM):
@@ -125,11 +141,13 @@ class PyGameKeyboardController(object):
         elif event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         elif event.key == pygame.K_PERIOD:
-            global SLEEP
-            SLEEP = max(SLEEP-0.02, 0.0)
+            global sleep
+            sleep = max(sleep-0.02, 0.0)
         elif event.key == pygame.K_COMMA:
-            global SLEEP
-            SLEEP += 0.02
+            global sleep
+            sleep += 0.02
+        elif event.key == pygame.K_h:
+            model.show_key = not model.show_key
 
         return True
         
@@ -141,6 +159,7 @@ if __name__ == '__main__':
     view = PyGameView(model, size)
     controller = PyGameKeyboardController(model)
     running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -152,7 +171,7 @@ if __name__ == '__main__':
         model.update()
         if model.show_gen:
             view.draw()
-            time.sleep(SLEEP)
+            time.sleep(sleep)
 
     # nn = NN()
     # z1 = np.array([-1, 1])

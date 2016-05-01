@@ -7,4 +7,15 @@ NUM_PARENTS = 2
 MUTATION_RATE = 0.2
 MUTATION_AMOUNT = 0.05
 
-SLEEP = 0.05
+sleep = 0.05
+
+CONTROLS = [
+    "Keyboard controls:",
+    "    <space> = quit program",
+    "    d = print NN weights to console",
+    "    k = kill all (new generation created)",
+    "    s = toggle simulation drawing",
+    "    . = speed up simulation",
+    "    , = slow down simulation",
+    "    h = toggle help"
+]
