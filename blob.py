@@ -16,7 +16,7 @@ class Blob(object):
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
-        self.angle = random.uniform(0,np.pi)
+        self.angle = np.pi / 2. #random.uniform(0,np.pi)
         self.energy = 1000
         self.MAX_ENERGY = 1000
         self.alive = True
@@ -60,9 +60,9 @@ class Blob(object):
         #     self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
 
         if self.angle > 2*np.pi:
-            self.angle = self.angle % (1 * np.pi)
+            self.angle = self.angle % (2 * np.pi)
         if self.angle < -2*np.pi:
-            self.angle = -self.angle % (1 * np.pi)
+            self.angle = -self.angle % (2 * np.pi)
 
     def update_position(self, deltaDist):
         """ update_position based on an output from the neural net.  In
@@ -90,12 +90,18 @@ class Blob(object):
 
         total_distance_food = np.hypot(deltaXfood, deltaYfood)
 
-        if deltaYfood < .1:
-            print deltaYfood
-            print total_distance_food
-
-        change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaYfood, deltaXfood))
+        change_angle_food = [(math.atan2(deltaYfood, deltaXfood) - self.angle),
+                            (math.atan2(-1 * deltaYfood, deltaXfood) - self.angle)]
+        #print change_angle_food
+        change_angle_food_min_index = np.argmin(np.abs(change_angle_food))
+        change_angle_food = change_angle_food[change_angle_food_min_index]
+                            #* (SCREEN_SIZE[0]/2)
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
+
+        #print deltaXfood, deltaYfood
+        #print math.atan2(deltaYfood, deltaXfood)
+        #print "nn input = " + str(change_angle_food * (180 / np.pi))
+        #print self.angle * (180 / np.pi)
 
         deltaXblob = self.target_food.center_x - self.center_x
         deltaYblob = self.target_food.center_y - self.center_y

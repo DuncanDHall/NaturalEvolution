@@ -149,7 +149,7 @@ if __name__ == '__main__':
         model.update()
         if model.show_gen:
             view.draw()
-            time.sleep(.0005)
+            #time.sleep(.05)
 
     # nn = NN()
     # z1 = np.array([-1, 1])
