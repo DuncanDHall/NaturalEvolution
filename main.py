@@ -160,7 +160,12 @@ if __name__ == '__main__':
     controller = PyGameKeyboardController(model)
     running = True
 
+    frame = 0
     while running:
+        frame += 1
+        if frame % 10 == 0:
+            print frame
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
