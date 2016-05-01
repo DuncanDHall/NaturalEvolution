@@ -18,16 +18,14 @@ class Blob(ParentSprite):
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = random.randint(5, 10)
         self.angle = random.uniform(0,np.pi)
-        self.MAX_VELOCITY = 5
         self.energy = 1000
         self.MAX_ENERGY = 1000
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
-        self.target = target
-        #TODO: make these two part of the genes
-        self.sight_radius = 150
-        self.sight_angle = math.pi / 3
+
+        self.target_blob = self
+        self.target_food = target
 
         #scoring related
         self.dist_moved = 0
@@ -35,7 +33,7 @@ class Blob(ParentSprite):
 
         # Neural Network stuff here:
         if nn is not None:
-            self.nn = nn
+            self.nn = NN(((1, nn),))
         else:
             self.nn = NN()
 
@@ -102,20 +100,29 @@ class Blob(ParentSprite):
     def process_neural_net(self):
         """ create environment and process through neural net brain
         """
-        
-        totalDistance = self.get_dist(self.target)
+        deltaXfood = self.target_food.center_x - self.center_x
+        deltaYfood = self.target_food.center_y - self.center_y
+
+        total_distance_food = np.hypot(deltaXfood, deltaYfood)
+        change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaYfood, deltaXfood))
         energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
-        change_angle = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target))
+
+        deltaXblob = self.target_food.center_x - self.center_x
+        deltaYblob = self.target_food.center_y - self.center_y
+        total_distance_blob = np.hypot(deltaXblob, deltaYblob)
+        change_angle_blob = (SCREEN_SIZE[0]/2) * (self.angle - math.atan2(deltaYblob, deltaXblob))
 
         env = np.array([
-            totalDistance,
-            change_angle,
-            energy_input
+            total_distance_food,
+            change_angle_food,
+            energy_input,
+            total_distance_blob,
+            change_angle_blob
             ])
         return self.nn.process(env)
 
 
-    def update_energy(self, model, deltaDist, delta_angle):
+    def update_energy(self, model, deltaDist, deltaAngle):
         """ is_alive updates the energy of the blob based on a constant value.
             If the energy drops below zero, then remove the blob and add it
             score the model.vip_genes list.
@@ -123,7 +130,7 @@ class Blob(ParentSprite):
             TODO: make blob lose energy based on distance moved
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(deltaDist) + 1
+        self.energy -= np.abs(deltaDist) + .1
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -196,7 +203,25 @@ class Blob(ParentSprite):
         self.color = int(self.energy / 4 + 5)
 
 
-    def update(self, model, current_blob):
+    def target_closest_blob(self, model):
+
+        rel_blobs = [[np.hypot(self.center_x - blob.center_x, self.center_y - blob.center_y), blob] for blob in model.blobs]
+        rel_blobs.sort()
+
+        if len(rel_blobs) > 1:
+            self.target_blob = rel_blobs[1][1] #get second smallest distance
+        else:
+            self.target_blob = self
+
+
+    def target_closest_food(self, model):
+
+        rel_food = [[np.hypot(self.center_x - food.center_x, self.center_y - food.center_y), food] for food in model.foods]
+        rel_food.sort()
+        self.target_food = rel_food[0][1]
+
+
+    def update(self, model):
         """ Update the all aspects of blob based on neural net decisions. Also
             assign next food target.  
 
@@ -215,13 +240,6 @@ class Blob(ParentSprite):
 
         self.eat_food(model)
 
-        #define target
-        foods_in_sight = self.get_things_within_sight(model.foods)
-        if len(foods_in_sight) > 0:
-            self.target = foods_in_sight[0]
-        else:
-            #random point on screen
-            #not sure if x corresponds to screen_size[0] and y to screen_size[1]
-            randx = self.center_x - 20*np.cos(self.angle - 0.5)
-            randy = self.center_y + 20*np.sin(self.angle - 0.5)
-            self.target = ParentSprite(randx, randy)
+        self.target_closest_blob(model)
+
+        self.target_closest_food(model)
