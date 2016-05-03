@@ -28,21 +28,21 @@ The simulation is run on Pygame, and the organisms make decisions using neural n
 <h3>
 <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>User Instructions</h3>
 
-<p>Our game has the following dependencies:
-Python 2.7
-Pygame 1.9.1 – get it
-Numpy 1.10.4 – get it
-To install our simulation game, run the following command in terminal:
-$ git clone https://github.com/DuncanDHall/NaturalEvolution.git
+<p>Our game has the following dependencies: <br>
+Python 2.7 <br>
+Pygame 1.9.1 – get it <br>
+Numpy 1.10.4 – get it <br>
+To install our simulation game, run the following command in terminal:<br>
+$ git clone https://github.com/DuncanDHall/NaturalEvolution.git<br>
 
 
-$ python main.py
+$ python main.py<br>
 At this point, a PyGame window should appear displaying 10 white "blobs" and one orange "food", which begin interacting. Pressing space stops the program and closes the window.</p>
 
 <h3>
 <a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Implentation</h3>
 
-<p>Each blob is an object with the following attributes: angle of sight, radius of sight, distance to food, angle to food, and energy left to live.
+<p>Each blob is an object with the following attributes: angle of sight, radius of sight, distance to food, angle to food, and energy left to live. <br>
 We implemented a neural network that pictured (here) that essentially takes the weighted average of the distance to food and angle to food to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved.
 With each generation, </p>
 
