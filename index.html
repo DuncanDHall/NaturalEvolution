@@ -40,21 +40,23 @@ $ python main.py<br>
 At this point, a PyGame window should appear displaying 10 white "blobs" and one orange "food", which begin interacting. Pressing space stops the program and closes the window.</p>
 
 <h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Implentation</h3>
+<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Implementation</h3>
 
 <p>Each blob is an object with the following attributes: angle of sight, radius of sight, distance to food, angle to food, and energy left to live. <br>
 We implemented a neural network that pictured (here) that essentially takes the weighted average of the distance to food and angle to food to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved.
 With each generation, </p>
 
 <h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Results</h3>
 
-<p>You can <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/#mentioning-users-and-teams" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor’s GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Add results and example videos here.</p>
 
 <h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Evolution/h3>
 
-<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
+<p>Prior to learning about neural networks, we created .
+<br> The final milestone in our project was implementing natural selection over artificial selection. In the first stages of our project, we would evaluate the fitness of each blob in the generation according to a formula we devised based on food. We then took the two most fit blobs and averaged their features while randomizing it to a certain percentage. This process is called artificial selection, and it was one of our original goals to move past this. <br>
+We switched to natural selection by assigning each blob an energy attribute that would decrease as the blob moved or waited, which essentially simulates metabolism in real organisms. If a blob runs out of energy, it dies. However, rather than taking the two most fit blobs at the end of each generation and combining their genes to produce the new generation, blobs would reproduce when they bumped into each other. This mimics natural reproduction and it introduces the need for a whole different style of behavior. </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/DuncanDHall/NaturalEvolution">Natural Evolution</a> is maintained by <a href="https://github.com/DuncanDHall">DuncanDHall</a>.</span>
