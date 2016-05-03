@@ -57,6 +57,18 @@ class PyGameView(object):
                     blob.int_center, 
                     (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
                     1)
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color('green'),
+                    blob.int_center,
+                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
+                    1)
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color('green'),
+                    blob.int_center,
+                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
+                    1)
         # draw food
         for food in self.model.foods:
             pygame.draw.circle(
@@ -93,12 +105,12 @@ class Model(object):
 
     def update(self):
         """ Update the model state """
-        for i in range(len(self.blobs)-1, 0, -1):
-            for j in range(i-1, -1, -1):
-                one = self.blobs[i]
-                two = self.blobs[j]
-                if one.intersect(two):
-                    one.interact(two, self)
+        # for i in range(len(self.blobs)-1, 0, -1):
+        #     for j in range(i-1, -1, -1):
+        #         one = self.blobs[i]
+        #         two = self.blobs[j]
+        #         if one.intersect(two):
+        #             one.interact(two, self)
 
         for blob in reversed(self.blobs):
             blob.update(self)
@@ -172,14 +184,14 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-            else:
+            else: 
                 # handle event can end pygame loop
                 if not controller.handle_event(event):
                     running = False
         model.update()
         if model.show_gen:
             view.draw()
-            time.sleep(sleep)
+            # time.sleep(sleep)
 
     # nn = NN()
     # z1 = np.array([-1, 1])

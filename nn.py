@@ -16,7 +16,7 @@ class NN(object):
 
         self.inputLayerSize = 5
         self.outputLayerSize = 2
-        self.hiddenLayerSize = 2
+        self.hiddenLayerSize = 6
 
         if parents_NN is not None:
             self.W1, self.W2 = self.get_recombine(parents_NN)
@@ -61,7 +61,7 @@ class NN(object):
         z3 = a2.dot(self.W2)
         a3 = self.sigmoid(z3)
 
-        return [a3[0] * 15, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
+        return [a3[0] * 10, a3[1]]  # * 5 is temp to see larger speeds given sigmoud of self.sigmoid(z3)
 
 
     def sigmoid(self, z):

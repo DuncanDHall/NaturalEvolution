@@ -16,26 +16,31 @@ class Blob(ParentSprite):
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         super(Blob, self).__init__(0, 0) #values are not needed
         self.int_center = int(self.center_x), int(self.center_y)
-        self.radius = 15
-        self.angle = random.uniform(0,np.pi)
+        self.radius = 10
+        self.angle = random.uniform(0,2*np.pi)
         self.energy = MAX_ENERGY
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
         self.maternity_leave = 0
 
+        self.sight_angle = 10 * (np.pi / 180.) 
+        self.sight_radius = 1000
+
         self.target_blob = self
         self.target_food = target
+
+        self.last_angle = .01
 
         #scoring related
         self.dist_moved = 0
         self.color = int(self.energy / 4 + 5)
 
-    # # Neural Network stuff here:
-    # if nn is not None:
-    #     self.nn = NN(((1, nn),))
-    # else:
-        self.nn = NN()
+        # Neural Network stuff here:
+        if nn is not None:
+            self.nn = NN(((1, nn),))
+        else:
+            self.nn = NN()
 
     def get_center_x(self):
         """Gets the x coordinate of the center"""
@@ -63,14 +68,19 @@ class Blob(ParentSprite):
         #     self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
 
         #stop at edge
-        if self.center_x<0:
-            self.center_x=0
-        if self.center_x>SCREEN_SIZE[0]:
-            self.center_x=SCREEN_SIZE[0]
+        # if self.center_x<0:
+        #     self.center_x=0
+        # if self.center_x>SCREEN_SIZE[0]:
+        #     self.center_x=SCREEN_SIZE[0]
 
-        if self.center_y <0:
+        # if self.center_y <0:
+        #     self.angle = -self.angle % np.pi
 
-            self.angle = -self.angle % np.pi 
+        #make sure that the angle does not get too large
+        if self.angle > 2*np.pi:
+            self.angle = self.angle % (2 * np.pi)
+        if self.angle < -2*np.pi:
+            self.angle = -self.angle % (2 * np.pi)
 
 
     def update_position(self, deltaDist):
@@ -94,18 +104,19 @@ class Blob(ParentSprite):
         """ create environment and process through neural net brain
         """
         total_distance_food = self.get_dist(self.target_food)
-        change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_food))
-        energy_input = self.energy / 4. #scale engery to similar size.  Max input = 250
-
+        # change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_food))
+        energy_input = self.energy / 1000. #scale engery to similar size.  Max input = 250
         total_distance_blob = self.get_dist(self.target_blob)
-        change_angle_blob = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_blob))
+        # change_angle_blob = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_blob))
 
         env = np.array([
             total_distance_food,
-            change_angle_food,
+            self.last_angle * 100,
+            .01,
+            # change_angle_food,
             energy_input,
-            total_distance_blob,
-            change_angle_blob
+            total_distance_blob
+            # change_angle_blob
             ])
         return self.nn.process(env)
 
@@ -139,9 +150,9 @@ class Blob(ParentSprite):
             distance = self.get_dist(thing)
             #checks if thing is within blob's radius of sight, and not right on top of it
             #right on top of itself is important when checking if other blobs are within sight
-            if (distance < self.sight_radius and distance > 0):
-
-                theta = self.angle_between(thing)
+            if distance > 0:
+                theta = self.angle - self.angle_between(thing)
+                theta = (theta + (2 * np.pi)) % (2 * np.pi)
                 #checks if food is within the blob's angle of sight
                 if np.fabs(theta) < self.sight_angle:
                     #within sight
@@ -171,14 +182,13 @@ class Blob(ParentSprite):
                 
                 model.foods.append(Food())
 
-                if random.random() <.01:
-                    model.blobs.append(Blob(model.foods[0], NN([(1, self.nn)])))
+                model.blobs.append(Blob(model.foods[0], NN([(1, self.nn)])))
 
-                # if len(model.blobs) > BLOB_NUM:
-                #     energy_list = []s
-                #     for blob in model.blobs:
-                #         energy_list.append(blob.energy)
-                #     del model.blobs[np.argmin(energy_list)]
+                if len(model.blobs) > BLOB_NUM:
+                    energy_list = []
+                    for blob in model.blobs:
+                        energy_list.append(blob.energy)
+                    del model.blobs[np.argmin(energy_list)]
 
 
     def score(self):
@@ -192,9 +202,9 @@ class Blob(ParentSprite):
         self.color = int(self.energy / 4 + 5)
 
 
-    def target_closest_blob(self, model):
+    def target_closest_blob(self, blob_list):
 
-        rel_blobs = [[self.get_dist(blob), blob] for blob in model.blobs]
+        rel_blobs = [[self.get_dist(blob), blob] for blob in blob_list]
         rel_blobs.sort()
 
         if len(rel_blobs) > 1:
@@ -203,23 +213,15 @@ class Blob(ParentSprite):
             self.target_blob = self
 
 
-    def target_closest_food(self, model):
+    def target_closest_food(self, food_list):
 
-        rel_food = [[self.get_dist(food), food] for food in model.foods]
+        rel_food = [[self.get_dist(food), food] for food in food_list]
         rel_food.sort()
-        self.target_food = rel_food[0][1]
 
-    def interact(self, other_blob, model):
-        """interaction"""
-        self.energy -= MAX_ENERGY/200
-        other_blob.energy -= MAX_ENERGY/200
-        if (self.energy > 0 or other_blob.energy > 0) and self.maternity_leave <=0 and other_blob.maternity_leave<=0:
-            neural_list = [(1, self.nn), (1, other_blob.nn)]
-            child = Blob(ParentSprite(self.center_x, self.center_y), NN(neural_list))
-            model.blobs.append(child)
-            self.maternity_leave = MATERNITY_LEAVE
-            other_blob.maternity_leave = MATERNITY_LEAVE
-        
+        if len(rel_food) > 0:
+            self.target_food = rel_food[0][1]
+        else:
+            self.target_food = self
 
     def update(self, model):
         """ Update the all aspects of blob based on neural net decisions. Also
@@ -229,6 +231,8 @@ class Blob(ParentSprite):
         """
 
         [dist_mag, angle_mag] = self.process_neural_net()
+
+        self.last_angle = angle_mag
 
         self.update_angle(angle_mag)
 
@@ -240,9 +244,6 @@ class Blob(ParentSprite):
 
         self.eat_food(model)
 
-        if random.random() <.3:
-            self.target_closest_blob(model)
+        self.target_closest_blob(self.get_things_within_sight(model.blobs))
 
-        self.target_closest_food(model)
-
-        self.maternity_leave -= 1
+        self.target_closest_food(self.get_things_within_sight(model.foods))
