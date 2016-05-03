@@ -40,9 +40,11 @@ $ python main.py
 At this point, a PyGame window should appear displaying 10 white "blobs" and one orange "food", which begin interacting. Pressing space stops the program and closes the window.</p>
 
 <h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating pages manually</h3>
+<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Implentation</h3>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Each blob is an object with the following attributes: angle of sight, radius of sight, distance to food, angle to food, and energy left to live.
+We implemented a neural network that pictured (here) that essentially takes the weighted average of the distance to food and angle to food to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved.
+With each generation, </p>
 
 <h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
