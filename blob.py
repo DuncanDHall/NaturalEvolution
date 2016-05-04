@@ -56,29 +56,29 @@ class Blob(ParentSprite):
             self.angle = -self.angle % (2 * np.pi)
 
 
-    def update_position(self, delta_dist):
+    def update_position(self, velocity):
         """ 
         updates self.center_x, self.center_y, and self.int_center
 
         Args:
-            delta_dist (float): the distance output from the neural network
+            velocity (float): the velocity output from the neural network
         """
-        self.center_x += delta_dist * np.cos(self.angle)
-        self.center_y += delta_dist * np.sin(self.angle)
+        self.center_x += velocity * np.cos(self.angle)
+        self.center_y += velocity * np.sin(self.angle)
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
-    def update_angle(self, delta_angle):
+    def update_angle(self, angular_velocity):
         """ 
         updates self.angle based on the 
             net.
         """
-        self.angle += delta_angle
+        self.angle += angular_velocity
 
 
     def process_neural_net(self):
         """
-        create environment and process through neural net brain
+        use blob's neural network to determine Euclidean and angular velocity
 
         Returns:
             list containing distance and angle magnitudes
@@ -99,18 +99,18 @@ class Blob(ParentSprite):
         return self.nn.process(env)
 
 
-    def update_energy(self, model, delta_dist, delta_angle):
+    def update_energy(self, model, velocity, angular_velocity):
         """ 
         updates self.energy of a blob based on the distance it moves and an 
         energy loss constant
 
         Args:
             model (object): contains attributes of the environment
-            delta_dist (float): the distance the blob will move
-            delta_angle (float): the angle the blob will change
+            velocity (float): the distance the blob will move
+            angular_velocity (float): the angle the blob will change
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(delta_dist) + ENERGY_LOSS_CONSTANT
+        self.energy -= np.abs(velocity) + ENERGY_LOSS_CONSTANT
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -237,15 +237,13 @@ class Blob(ParentSprite):
             TODO: make the food targeting a function.
         """
 
-        [dist_mag, angle_mag] = self.process_neural_net()
+        [velocity, angular_velocity] = self.process_neural_net()
 
-        self.last_angle = angle_mag
+        self.update_angle(angular_velocity)
 
-        self.update_angle(angle_mag)
+        self.update_position(velocity)
 
-        self.update_position(dist_mag)
-
-        self.update_energy(model, dist_mag, angle_mag)
+        self.update_energy(model, velocity, angular_velocity)
 
         self.update_color()
 

@@ -9,25 +9,36 @@ from constants import *
 import os
 
 
+
 class PyGameView(object):
-    """ Provides a view of the environment in a pygame
-        window """
+    """ 
+    Provides a view of the environment in a pygame window 
+    """
+
+
     def __init__(self, model, size):
-        """ Initialize with the specified model """
+        """ 
+        Initialize with the specified model 
+        """
         self.model = model
         self.screen = pygame.display.set_mode(size)
 
+
     def draw_text(self, text, x, y, size, color=(100, 100, 100)):
-        """ helper to draw text (string input) onto screen at coords (x, y)
-            and specified font size and color
+        """ 
+        helper to draw text (string input) onto screen at coords (x, y)
+        and specified font size and color
         """
         basicfont = pygame.font.SysFont(None, size)
         text_render = basicfont.render(
             text, True, color)
         self.screen.blit(text_render, (x, y))
 
+
     def draw(self):
-        """ Draw the simulation to the pygame window """
+        """ 
+        Draw the simulation to the pygame window 
+        """
         # fill background
         self.screen.fill(pygame.Color('black'))
 
@@ -82,9 +93,17 @@ class PyGameView(object):
         pygame.display.update()
 
 
+
 class Model(object):
-    """ Represents the state of all entities in the environment"""
+    """ 
+    Represents the state of all entities in the environment
+    """
+
+
     def __init__(self, width, height):
+        """
+
+        """
         self.height = height
         self.width = width
 
@@ -105,15 +124,11 @@ class Model(object):
         for i in range(0, BLOB_NUM):
             self.blobs.append(Blob())
 
-    def update(self):
-        """ Update the model state """
-        # for i in range(len(self.blobs)-1, 0, -1):
-        #     for j in range(i-1, -1, -1):
-        #         one = self.blobs[i]
-        #         two = self.blobs[j]
-        #         if one.intersect(two):
-        #             one.interact(two, self)
 
+    def update(self):
+        """ 
+        Update the model state 
+        """
         for blob in reversed(self.blobs):
             blob.update(self)
 
@@ -126,8 +141,11 @@ class Model(object):
             if self.generation % 10 == 0:
                 print 'generation {} complete'.format(self.generation)
 
+
     def create_generation(self, num_winners=2):
-        """ Handles gene mutation and recombination"""
+        """ 
+        Handles gene mutation and recombination
+        """
         top_scoring = sorted(self.vip_genes, reverse=True)[:num_winners]
 
         for i in range(0, BLOB_NUM):
@@ -136,13 +154,24 @@ class Model(object):
             self.blobs.append(Blob(new_NN))
 
 
+
 class PyGameKeyboardController(object):
+    """
+
+    """
+
+
     def __init__(self, model):
+        """
+        
+        """
         self.model = model
 
+
     def handle_event(self, event):
-        """ Look for left and right keypresses to
-            modify the x position of the paddle """
+        """ 
+        Look for left and right keypresses to modify the x position of the paddle 
+        """
         if event.type != KEYDOWN:
             return True
         elif event.key == pygame.K_SPACE:
@@ -156,7 +185,6 @@ class PyGameKeyboardController(object):
                 print ""
                 print blob.nn.W2
                 # break #iterate through first thing in a list
-
         elif event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
@@ -171,6 +199,8 @@ class PyGameKeyboardController(object):
         elif event.key == pygame.K_a:
             model.draw_sight = not model.draw_sight
         return True
+
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -193,7 +223,3 @@ if __name__ == '__main__':
         if model.show_gen:
             view.draw()
             time.sleep(model.sleep_time)
-
-    # nn = NN()
-    # z1 = np.array([-1, 1])
-    # print nn.process(z1)
