@@ -77,17 +77,20 @@ class Blob(ParentSprite):
 
 
     def process_neural_net(self):
-        """ create environment and process through neural net brain
         """
-        blob_target_input = 0 if self.target_blob == self else 1
+        create environment and process through neural net brain
+
+        Returns:
+            list containing distance and angle magnitudes
+        """
+        #assign binary inputs if the blob can see a food or blob object
+        blob_target_input = 0 if self.target_blob == self else 1 
         food_target_input = 0 if self.target_food == self else 1
 
-        total_distance_food = self.get_dist(self.target_food)
-        # change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_food))
-        energy_input = self.energy / 1000. #scale engery to similar size.  Max input = 250
-        total_distance_blob = self.get_dist(self.target_blob)
-        # change_angle_blob = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_blob))
+        #preprocess neural net inputs
+        energy_input = self.energy / 1000. #scale engery between 1 through 0
 
+        #create array containing neural net inputs
         env = np.array([
             blob_target_input,
             food_target_input,
@@ -96,17 +99,18 @@ class Blob(ParentSprite):
         return self.nn.process(env)
 
 
-    def update_energy(self, model, deltaDist, deltaAngle):
+    def update_energy(self, model, delta_dist, delta_angle):
         """ 
-        updates self.energy of a blob based on distance moved and a constant value.
-        is_alive updates the energy of the blob based on a constant value.
-            If the energy drops below zero, then remove the blob and add it
-            score the model.vip_genes list.
+        updates self.energy of a blob based on the distance it moves and an 
+        energy loss constant
 
-            TODO: make blob lose energy based on distance moved
+        Args:
+            model (object): contains attributes of the environment
+            delta_dist (float): the distance the blob will move
+            delta_angle (float): the angle the blob will change
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(deltaDist) + ENERGY_LOSS_CONSTANT
+        self.energy -= np.abs(delta_dist) + ENERGY_LOSS_CONSTANT
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()
@@ -116,10 +120,17 @@ class Blob(ParentSprite):
 
 
     def get_things_within_sight(self, list_of_things):
+        """
+        determines what objects are within a blob's field of vision
+
+        Args:
+            list_of_things (list): a list of objects created using ParentSprite class
+
+        Returns:
+            list containing objects in a blob's field of vision
+        """
         in_sight = []
-        # closest_x = -1
-        # closest_y = -1
-        # closest_distance = 10000
+
         #iterate through all food
         for thing in list_of_things:
             distance = self.get_dist(thing)
@@ -138,10 +149,13 @@ class Blob(ParentSprite):
 
 
     def eat_food(self, model):
-        """ eat_food tests whether or not a blob eats food on a given frame.
-            If a blobl eats food, add to the blobs energy and remove the food.
-            In addition, asexually reproduce based on its neural net dna, and
-            do some population control.
+        """ 
+        tests whether or not a blob eats food on a given frame. If a blob 
+        eats food, remove the food, increase the blob's energy, asexually 
+        reproduce based on its neural net dna, and do some population control.
+
+        Args:
+            model (object): contains attributes of the environment
 
         """
         for i in range(len(model.foods)-1, -1, -1):
@@ -167,18 +181,30 @@ class Blob(ParentSprite):
 
 
     def score(self):
-        """ score is the scoring / fitness function.  Try to make as simple as
-            possible while still getting interesting behavior
+        """
+        gives a blob's score based on: self.food_eaten
+
+        Returns:
+            the number of food eaten by the blob
         """
         return self.food_eaten
 
 
     def update_color(self):
+        """
+        update self.color on it's current energy
+        """
         self.color = int(self.energy / 4 + 5)
 
 
     def target_closest_blob(self, blob_list):
+        """
+        update self.target_blob to the closest blob given a list of blobs. If 
+        no blobs in sight, update self.target_blob to self
 
+        Args:
+            blob_list (list): list of blobs. Generally blobs it can see.
+        """
         rel_blobs = [[self.get_dist(blob), blob] for blob in blob_list]
         rel_blobs.sort()
 
@@ -189,7 +215,13 @@ class Blob(ParentSprite):
 
 
     def target_closest_food(self, food_list):
+        """
+        update self.target_food to the closest food given a list of foods. If 
+        no food in sight, update self.target_food to self
 
+        Args:
+            food_list (list): list of foods. Generally foods it can see.
+        """
         rel_food = [[self.get_dist(food), food] for food in food_list]
         rel_food.sort()
 

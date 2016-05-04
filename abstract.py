@@ -4,7 +4,9 @@ import random
 from constants import *
 
 class ParentSprite(object):
-
+    """
+    bleghsadlfjasdl
+    """
     def __init__(self):
         """ 
         Initialize a random location for the sprite
