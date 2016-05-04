@@ -20,6 +20,7 @@
       <nav class ="navigate">
       <a href="index.html" class='navtag'>Home</a>
       <a href="implementation.html" class='navtag'>Implementation</a>
+      <a href="narrative.html" class='navtag'>Narrative</a>
     </nav>
     </section>
     
@@ -35,9 +36,7 @@
 <a id="designer-templates" class="anchor" href="#Environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Simulation Environment</h3>
 
 <p>
-The screen shows a 500x500 block of an infinite plane. Food and blobs will always spawn on the screen, though blobs can move outside of that plane. Depending on our point in this project’s evolution, blobs either reproduce when they eat food (in which the new blob’s genetic material stems from one parent), or when two blobs meet (in which the new blob’s genetic material is based off both the blobs).<br><br>
-
-When all the blobs die, a new population of blobs are born, based on the two top scoring blobs of the previous generation. The score is based on the amount of food eaten.
+The screen shows a 500x500 block of an infinite plane. Food and blobs will always spawn on the screen, though blobs can move outside of that plane. Depending on our point in this project’s evolution, blobs either reproduce when they eat food (in which the new blob’s genetic material stems from one parent), or when two blobs meet (in which the new blob’s genetic material is based off both the blobs). When all the blobs die, a new population of blobs are born, based on the two top scoring blobs of the previous population. The score is based on the amount of food eaten.
 </p>
 
 <h3>
@@ -48,7 +47,7 @@ Each blob is an object with the following attributes: angle of sight, radius of 
 
 Each blob has an angle, which determines where it can move to and how far it can see. The blob can only target food and other blobs that are within their angle of vision, which is 10 degrees to the left and the right of the angle that the blob is facing.<br><br>
 
-When a blob eats food, they gain energy. The blob’s energy simulates metabolism in real organisms. When they move around, they lose energy proportional to the distance they moved in that time step, as well as losing a constant amount of energy every time step. When the blob runs out of energy, they die and are removed from the simulation.
+When a blob eats food, they gain energy. The blob’s energy simulates metabolism in real organisms. When blobs move around, they lose energy proportional to the distance they moved in that time step, as well as losing a constant amount of energy every time step. When the blob runs out of energy, they die and are removed from the simulation.
 </p>
 
 
@@ -57,9 +56,10 @@ When a blob eats food, they gain energy. The blob’s energy simulates metabolis
 <h3>
 <a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Neural Network</h3>
 
-<p>Prior to learning about neural networks, we created a linear system of decision making, in which we multiplied the inputs by a matrix of values. With a neural network, we can create much more complex decision making processes.
-<br> <br>
-We implemented a neural network that pictured (here) that essentially takes the distance and angle to food, the distance and angle to the nearest blob, and the energy left to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved. The blobs movement can thus be considered a function of several variables. As the generations evolve, the coefficients of the weights change such that the function that defines the blobs' movement becomes better and better. Currently, the neural network is the only one of the blob’s attributes that is genetically modified over generations.
+<p>Prior to learning about neural networks, we created a linear system for decision making in which we multiplied the inputs by a matrix of values. With a neural network, we can create much more complex decision making processes.
+</p>
+<p>
+We implemented a neural network with one layer of hidden nodes pictured (here) that essentially takes the distance and angle to food, the distance and angle to the nearest blob, and the energy left to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved. The blobs movement can thus be considered a function of several variables. As the generations evolve, the coefficients of the weights change such that the function that defines the blobs' movement becomes better and better. Currently, the neural network is the only one of the blob’s attributes that is genetically modified over generations.
 
  </p>
 
@@ -81,5 +81,7 @@ In order to draw the simulation, we use pygame and a model, view, controller mod
   
   </body>
 </html>
+
+
 
 
