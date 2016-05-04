@@ -28,48 +28,27 @@
     <section class="main-content">
 
       <h2>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><b><u>Implementation</u></b></h2>
-
-
-
-<h3>
-<a id="designer-templates" class="anchor" href="#Environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Simulation Environment</h3>
+<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><b><u>Our Project's Story</u></b></h2>
 
 <p>
-The screen shows a 500x500 block of an infinite plane. Food and blobs will always spawn on the screen, though blobs can move outside of that plane. Depending on our point in this project’s evolution, blobs either reproduce when they eat food (in which the new blob’s genetic material stems from one parent), or when two blobs meet (in which the new blob’s genetic material is based off both the blobs). When all the blobs die, a new population of blobs are born, based on the two top scoring blobs of the previous population. The score is based on the amount of food eaten.
+The motivation behind this project was to explore genetic algorithms with natural selection in contrast to the scoring and artificial selection which is usually used in programed problem solving. We decided to create our own simulate rather than trying to solve an existing problem with evolutionary algorithms.
 </p>
-
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Blob Attributes</h3>
-
 <p>
-Each blob is an object with the following attributes: angle of sight, radius of sight, x and y coordinates, amount of energy, the angle it is facing, and it's neural network object. It also keeps track of distance and angle to the closest food,distance and angle to the closest blob, and the number of food it eats.<br><br>
-
-Each blob has an angle, which determines where it can move to and how far it can see. The blob can only target food and other blobs that are within their angle of vision, which is 10 degrees to the left and the right of the angle that the blob is facing.<br><br>
-
-When a blob eats food, they gain energy. The blob’s energy simulates metabolism in real organisms. When blobs move around, they lose energy proportional to the distance they moved in that time step, as well as losing a constant amount of energy every time step. When the blob runs out of energy, they die and are removed from the simulation.
+We began by trying to implement a genetic algorithm that selects for the best blobs artificially. At this stage we were experimenting with mutation scoring mechanisms, starting with a raw average of the elements in the two top-scoring blobs’ neural networks, and moving to a method more reflective of the natural world. Currently, child networks are created by choosing random corresponding elements from its parents for each element in its own weight matrices, and then applying mutations to those elements at a user-defined rate. Scoring was initially based on distance moved towards the singular food we had at the time, but we quickly discovered that this kind of artificial selection was overly dependent on our formula. Once we had fully implemented our final neural networks, score became a raw count of the number of food eaten by the agent.
+</p>
+<p>
+Another improvement we made was to add a field of vision to each blob. Previously, each blob was aware of where every single food was, regardless of distance and line of sight. This was obviously not realistic, so we changed each blob to only spot food within a specific angle and radius. This resulted in interesting behavior: the blobs started spinning more, which is in fact the best way to maximize ground covered.
+<img src="field_of_vision.jpg" alt="Field of Vision">
+// gonna have to create a screenshot of blobs vision
+</p>
+<p>
+The final milestone in our project was implementing natural selection over artificial selection. We’ve transitioned to allowing blobs to detect both food and other blobs, though currently they only learn to ignore each other and go for the food, regardless of how many generations we run. To try to stimulate some kind of social interaction between blobs, we’ve made blobs reproduce when they intersect, though the neural networks and current sensory input seems to not allow the development of behavior around this. Instead, the reproduction either over-populates the screen with blobs, or is too heavy of a culling force depending on the energy cost of the reproduction.
 </p>
 
 
+<h3>a id="designer-templates" class="anchor" href="#Environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Simulation Environment</h3>
 
 
-<h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Neural Network</h3>
-
-<p>Prior to learning about neural networks, we created a linear system for decision making in which we multiplied the inputs by a matrix of values. With a neural network, we can create much more complex decision making processes.
-</p>
-<img src="Neural Net Diagram.jpg" alt="Neural Network">
-<p>
-We implemented a neural network with one layer of hidden nodes pictured (here) that essentially takes the distance and angle to food, the distance and angle to the nearest blob, and the energy left to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved. The blobs movement can thus be considered a function of several variables. As the generations evolve, the coefficients of the weights change such that the function that defines the blobs' movement becomes better and better. Currently, the neural network is the only one of the blob’s attributes that is genetically modified over generations.
-
- </p>
-
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Code Structure</h3>
-
-<p>Both food and blobs are considered Parent Sprites. Parent Sprites manipulate their locations and create a standard definition of angle between and distance between methods.<br><br>
-
-In order to draw the simulation, we use pygame and a model, view, controller model. </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/DuncanDHall/NaturalEvolution">Natural Evolution</a> is maintained by <a href="https://github.com/DuncanDHall">DuncanDHall</a>.</span>
@@ -82,7 +61,5 @@ In order to draw the simulation, we use pygame and a model, view, controller mod
   
   </body>
 </html>
-
-
 
 
