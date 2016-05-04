@@ -14,9 +14,7 @@ class Blob(ParentSprite):
         """ Create a blob object with the specified parameters:
 
         """
-        self.center_x = random.randint(0, SCREEN_SIZE[0])
-        self.center_y = random.randint(0, SCREEN_SIZE[1])
-        super(Blob, self).__init__(0, 0) #values are not needed
+        super(Blob, self).__init__() #values are not needed
         self.int_center = int(self.center_x), int(self.center_y)
         self.radius = 10
         self.angle = random.uniform(0,2*np.pi)

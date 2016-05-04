@@ -5,9 +5,9 @@ from constants import *
 
 class ParentSprite(object):
 
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self):
+        self.center_x = random.randint(0, SCREEN_SIZE[0])
+        self.center_y = random.randint(0, SCREEN_SIZE[1])
 
     def get_center_x(self):
         """Gets the x coordinate of the center"""
