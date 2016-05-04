@@ -11,22 +11,12 @@ class ParentSprite(object):
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
 
-    def get_center_x(self):
-        """ Gets the x coordinate of the sprite
-        """
-        return self.center_x
-
-    def get_center_y(self):
-        """ Gets the y coordinate of the sprite
-        """
-        return self.center_y
-
     def get_dist(self, other):
         """ The distance between two abstract sprites
             Arugments: other - the other sprite
         """
         dist = np.hypot(
-            other.get_center_x()-self.get_center_x(), other.get_center_y()-self.get_center_y())
+            other.center_x-self.center_x, other.center_y-self.center_y)
         return dist
 
     def intersect(self, other):
@@ -40,6 +30,6 @@ class ParentSprite(object):
         """ Gets the angle between this sprite and another Abstract Sprite
             Arguments: other the other sprite
         """
-        deltaX = other.get_center_x() - self.get_center_x()
-        deltaY = other.get_center_y() - self.get_center_y()
+        deltaX = other.center_x - self.center_x
+        deltaY = other.center_y - self.center_y
         return math.atan2(deltaY, deltaX)

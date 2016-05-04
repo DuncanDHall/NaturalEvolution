@@ -7,12 +7,13 @@ import math
 
 
 class Blob(ParentSprite):
-    """ Represents a ball in my natural evolution simulation """
+    """ Represents a blob in the natural/articifial evolution simulation
+    """
 
 
-    def __init__(self, target, nn=None):
+    def __init__(self, nn=None):
         """ Create a blob object with the specified parameters:
-
+            Arguments:
         """
         super(Blob, self).__init__() #values are not needed
         self.int_center = int(self.center_x), int(self.center_y)
@@ -28,7 +29,7 @@ class Blob(ParentSprite):
         self.sight_radius = 1000
 
         self.target_blob = self
-        self.target_food = target
+        self.target_food = self
 
         self.last_angle = .01
 
@@ -101,12 +102,10 @@ class Blob(ParentSprite):
 
         env = np.array([
             total_distance_food,
-            self.last_angle * 100,
-            .01,
-            # change_angle_food,
+            total_distance_blob,
             energy_input,
-            total_distance_blob
-            # change_angle_blob
+            self.last_angle * 100,
+            .01
             ])
         return self.nn.process(env)
 
@@ -135,8 +134,6 @@ class Blob(ParentSprite):
         # closest_distance = 10000
         #iterate through all food
         for thing in list_of_things:
-            x = thing.get_center_x()
-            y = thing.get_center_y()
             distance = self.get_dist(thing)
             #checks if thing is within blob's radius of sight, and not right on top of it
             #right on top of itself is important when checking if other blobs are within sight
@@ -172,7 +169,7 @@ class Blob(ParentSprite):
 
                 model.foods.append(Food())
 
-                model.blobs.append(Blob(model.foods[0], NN([(1, self.nn)])))
+                model.blobs.append(Blob(NN([(1, self.nn)])))
 
                 if len(model.blobs) > BLOB_NUM:
                     energy_list = []

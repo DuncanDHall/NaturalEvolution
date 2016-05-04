@@ -103,7 +103,7 @@ class Model(object):
 
         # create blobs
         for i in range(0, BLOB_NUM):
-            self.blobs.append(Blob(self.foods[0]))
+            self.blobs.append(Blob())
 
     def update(self):
         """ Update the model state """
@@ -133,7 +133,7 @@ class Model(object):
         for i in range(0, BLOB_NUM):
             new_NN = NN(parents_NN=top_scoring)
             # TODO: Check if dna results are the blobs or others >> hmm?
-            self.blobs.append(Blob(self.foods[0], new_NN))
+            self.blobs.append(Blob(new_NN))
 
 
 class PyGameKeyboardController(object):
