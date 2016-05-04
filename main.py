@@ -163,9 +163,9 @@ class PyGameKeyboardController(object):
         elif event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         elif event.key == pygame.K_PERIOD:
-            model.sleep_time = max(model.sleep_time-0.02, 0.0)
+            model.sleep_time = max(model.sleep_time-0.005, 0.0)
         elif event.key == pygame.K_COMMA:
-            model.sleep_time += 0.02
+            model.sleep_time += 0.005
         elif event.key == pygame.K_h:
             model.show_key = not model.show_key
         elif event.key == pygame.K_a:

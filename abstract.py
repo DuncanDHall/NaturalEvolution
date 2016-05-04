@@ -6,14 +6,17 @@ from constants import *
 class ParentSprite(object):
 
     def __init__(self):
-        """ Initialize a random location for the sprite
+        """ 
+        Initialize a random location for the sprite
         """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
 
     def get_dist(self, other):
-        """ The distance between two abstract sprites
-            Arugments: other - the other sprite
+        """ 
+        The distance between two abstract sprites
+        Args:
+            other (object) - the other sprite
         """
         dist = np.hypot(
             other.center_x-self.center_x, other.center_y-self.center_y)

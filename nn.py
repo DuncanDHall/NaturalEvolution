@@ -14,9 +14,9 @@ class NN(object):
             parents_NN should be passed in as a tuple of NN objects
         """
 
-        self.inputLayerSize = 5
+        self.inputLayerSize = 3
         self.outputLayerSize = 2
-        self.hiddenLayerSize = 6
+        self.hiddenLayerSize = 4
 
         if parents_NN is not None:
             self.W1, self.W2 = self.get_recombine(parents_NN)

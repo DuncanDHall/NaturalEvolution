@@ -12,8 +12,11 @@ class Blob(ParentSprite):
 
 
     def __init__(self, nn=None):
-        """ Create a blob object with the specified parameters:
-            Arguments:
+        """ 
+        Initialize blob by inheriting ParentSprite and assigning attributes
+
+        Args:
+            nn (class): can pass in the neural net from another blob
         """
         super(Blob, self).__init__() #values are not needed
         self.int_center = int(self.center_x), int(self.center_y)
@@ -23,7 +26,6 @@ class Blob(ParentSprite):
         self.alive = True
         self.food_eaten = 0
         self.score_int = 0
-        self.maternity_leave = 0
 
         self.sight_angle = 10 * (np.pi / 180.)
         self.sight_radius = 1000
@@ -44,48 +46,31 @@ class Blob(ParentSprite):
             self.nn = NN()
 
     def out_of_bounds(self):
-        """ moves the blob to the other side of the screen if it moves out of
-            bounds.  It will also make sure angle is between 0 and 2pi
+        """ 
+        updates self.angle so it is always between -2pi and +2pi
         """
-        # #wrap around
-        # if self.center_x<0:
-        #     self.center_x=int(SCREEN_SIZE[0])+self.center_x
-        # if self.center_x>SCREEN_SIZE[0]:
-        #     self.center_x=0+(self.center_x-int(SCREEN_SIZE[0]))
 
-        # if self.center_y <0:
-        #     self.center_y=int(SCREEN_SIZE[1])+self.center_y
-        # if self.center_y>SCREEN_SIZE[1]:
-        #     self.center_y=0+(self.center_y-int(SCREEN_SIZE[1]))
-
-        #stop at edge
-        # if self.center_x<0:
-        #     self.center_x=0
-        # if self.center_x>SCREEN_SIZE[0]:
-        #     self.center_x=SCREEN_SIZE[0]
-
-        # if self.center_y <0:
-        #     self.angle = -self.angle % np.pi
-
-        #make sure that the angle does not get too large
         if self.angle > 2*np.pi:
             self.angle = self.angle % (2 * np.pi)
         if self.angle < -2*np.pi:
             self.angle = -self.angle % (2 * np.pi)
 
 
-    def update_position(self, deltaDist):
-        """ update_position based on an output from the neural net.  In
-            addition, update attribute self.dist_moved for scoring related
-            purposes
+    def update_position(self, delta_dist):
+        """ 
+        updates self.center_x, self.center_y, and self.int_center
+
+        Args:
+            delta_dist (float): the distance output from the neural network
         """
-        self.center_x += deltaDist * np.cos(self.angle)
-        self.center_y += deltaDist * np.sin(self.angle)
+        self.center_x += delta_dist * np.cos(self.angle)
+        self.center_y += delta_dist * np.sin(self.angle)
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
 
     def update_angle(self, delta_angle):
-        """ update_angle changes the angle based on an output from the neural
+        """ 
+        updates self.angle based on the 
             net.
         """
         self.angle += delta_angle
@@ -94,6 +79,9 @@ class Blob(ParentSprite):
     def process_neural_net(self):
         """ create environment and process through neural net brain
         """
+        blob_target_input = 0 if self.target_blob == self else 1
+        food_target_input = 0 if self.target_food == self else 1
+
         total_distance_food = self.get_dist(self.target_food)
         # change_angle_food = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_food))
         energy_input = self.energy / 1000. #scale engery to similar size.  Max input = 250
@@ -101,11 +89,9 @@ class Blob(ParentSprite):
         # change_angle_blob = (SCREEN_SIZE[0]/2) * (self.angle - self.angle_between(self.target_blob))
 
         env = np.array([
-            total_distance_food,
-            total_distance_blob,
+            blob_target_input,
+            food_target_input,
             energy_input,
-            self.last_angle * 100,
-            .01
             ])
         return self.nn.process(env)
 
