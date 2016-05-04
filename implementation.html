@@ -58,6 +58,8 @@ When a blob eats food, they gain energy. The blob’s energy simulates metabolis
 
 <p>Prior to learning about neural networks, we created a linear system for decision making in which we multiplied the inputs by a matrix of values. With a neural network, we can create much more complex decision making processes.
 </p>
+<h2>Neural Network</h2>
+<img src="Neural Network Diagram.jpg" alt="Neural Network" style="width:500px;height:500px;">
 <p>
 We implemented a neural network with one layer of hidden nodes pictured (here) that essentially takes the distance and angle to food, the distance and angle to the nearest blob, and the energy left to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved. The blobs movement can thus be considered a function of several variables. As the generations evolve, the coefficients of the weights change such that the function that defines the blobs' movement becomes better and better. Currently, the neural network is the only one of the blob’s attributes that is genetically modified over generations.
 
