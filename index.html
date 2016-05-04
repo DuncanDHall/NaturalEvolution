@@ -39,18 +39,26 @@ The simulation is run in Pygame, and the organisms make decisions using neural n
 
 <p><b>Our game has the following dependencies: </b><br>
 Python 2.7 <br>
-Pygame 1.9.1 – <a href=”http://www.pygame.org/wiki/GettingStarted”>get it</a> <br>
+Pygame 1.9.1 – <a href=”http://pygame.org/download.shtml”>get it</a> <br>
 Numpy 1.10.4 – <a href="http://www.scipy.org/scipylib/download.html">get it</a> <br> <br>
 <b>To install our simulation game, run the following command in terminal:</b><br>
 <div class=”boxed”>$ git clone https://github.com/DuncanDHall/NaturalEvolution.git<br>
 $ python main.py</div><br><br>
-At this point, a PyGame window should appear displaying 10 white "blobs" and one orange "food", which begin interacting. Pressing space stops the program and closes the window.</p>
+At this point, a PyGame window should appear displaying 15 white "blobs" and several orange "foods", which begin interacting. Use the following keyboard controls: <br>
+<space> = quit program<br>
+D = print NN weights to console<br>
+K = kill all (new generation created)<br>
+S = toggle simulation drawing<br>
+. = speed up simulation<br>
+, = slow down simulation<br>
+H = toggle help
+</p>
 
 <h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Results</h3>
 
 <p>
-In this first video, the blobs are shown at a late stage of evolution. They are already fairly efficient at spotting and reaching food. Until a blob spots a food within its line of sight, it tends to spin with a small radius. This is logically the most efficient way to “cover ground.” When a blob spots food, it moves directly to it at an even rate. <br>
+In this first video, the blobs are shown at a late stage of evolution. They are already fairly efficient at spotting and reaching food. Until a blob spots a food within its line of sight, it tends to spin with a small radius. This is logically the most efficient way to “cover ground.” When a blob spots food, it moves directly to it at an even rate. <br> <br>
 <iframe width="700" height="525" src="https://www.youtube.com/embed/_UbF70yXRt4" frameborder="0" allowfullscreen></iframe> <br> <br>
 The second video is similar to the first one, except we display blobs’ lines of sight. This should make their food seeking behavior more apparent. Also note that as blobs start to run out of energy, they decrease their speed in order to save energy. <br> <br>
 
