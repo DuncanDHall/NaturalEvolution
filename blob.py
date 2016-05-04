@@ -97,14 +97,16 @@ class Blob(ParentSprite):
 
 
     def update_energy(self, model, deltaDist, deltaAngle):
-        """ is_alive updates the energy of the blob based on a constant value.
+        """ 
+        updates self.energy of a blob based on distance moved and a constant value.
+        is_alive updates the energy of the blob based on a constant value.
             If the energy drops below zero, then remove the blob and add it
             score the model.vip_genes list.
 
             TODO: make blob lose energy based on distance moved
         """
         #subtract evergy based on distance moved
-        self.energy -= np.abs(deltaDist) + .1
+        self.energy -= np.abs(deltaDist) + ENERGY_LOSS_CONSTANT
         if self.energy < 0:
             self.alive = False
             self.score_int = self.score()

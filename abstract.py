@@ -15,6 +15,7 @@ class ParentSprite(object):
     def get_dist(self, other):
         """ 
         The distance between two abstract sprites
+
         Args:
             other (object) - the other sprite
         """
@@ -23,15 +24,21 @@ class ParentSprite(object):
         return dist
 
     def intersect(self, other):
-        """ Tells whether or not two AbstractSprites are intersecting
-            Arguments: other - the other sprite
+        """
+        Tells whether or not two AbstractSprites are intersecting
+            
+        Args: 
+            other (object) - the other sprite
         """
         dist = self.get_dist(other)
         return dist < self.radius + other.radius
 
     def angle_between(self, other):
-        """ Gets the angle between this sprite and another Abstract Sprite
-            Arguments: other the other sprite
+        """ 
+        Gets the angle between this sprite and another Abstract Sprite
+            
+        Args:
+            other (object): other the other sprite
         """
         deltaX = other.center_x - self.center_x
         deltaY = other.center_y - self.center_y
