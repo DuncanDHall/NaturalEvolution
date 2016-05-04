@@ -7,12 +7,11 @@ import math
 
 
 class Blob(ParentSprite):
-    """ Represents a blob in the natural / artificial evolution simulation.
-    """
+    """ Represents a ball in my natural evolution simulation """
 
 
     def __init__(self, target, nn=None):
-        """ Create a blob object with the specified parameters and inheritance:
+        """ Create a blob object with the specified parameters:
 
         """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
@@ -44,16 +43,6 @@ class Blob(ParentSprite):
             self.nn = NN(((1, nn),))
         else:
             self.nn = NN()
-
-    def get_center_x(self):
-        """Gets the x coordinate of the center"""
-        #return a random value within constants screen size
-        return self.center_x
-
-    def get_center_y(self):
-        """Gets the y coordinate of the center"""
-        #return a random value within constants screen size
-        return self.center_y
 
     def out_of_bounds(self):
         """ moves the blob to the other side of the screen if it moves out of

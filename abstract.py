@@ -11,16 +11,14 @@ class ParentSprite(object):
 
     def get_center_x(self):
         """Gets the x coordinate of the center"""
-        #return a random value within constants screen size
-        return self.x
+        return self.center_x
 
     def get_center_y(self):
         """Gets the y coordinate of the center"""
-        #return a random value within constants screen size
-        return self.y
+        return self.center_y
 
     def get_dist(self, other):
-        """ 
+        """
         Gets the distance between two abstract sprites
         """
         dist = np.hypot(
@@ -28,7 +26,7 @@ class ParentSprite(object):
         return dist
 
     def intersect(self, other):
-        """ 
+        """
         tells whether or not two AbstractSprites are intersecting
         """
         dist = self.get_dist(other)
