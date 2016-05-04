@@ -60,9 +60,8 @@ When a blob eats food, they gain energy. The blob’s energy simulates metabolis
 </p>
 <img src="images/Neural Net Diagram.jpg" alt="Neural Network">
 <p>
-We implemented a neural network with one layer of hidden nodes pictured (here) that essentially takes the distance and angle to food, the distance and angle to the nearest blob, and the energy left to calculate the angle and speed at which the blob moves. The weights are simply constants that are genetically evolved. The blobs movement can thus be considered a function of several variables. As the generations evolve, the coefficients of the weights change such that the function that defines the blobs' movement becomes better and better. Currently, the neural network is the only one of the blob’s attributes that is genetically modified over generations.
-
- </p>
+We implemented a neural network with one layer of hidden nodes with binary inputs for food and other blob detection within its 20˚ sight arc, as well as an input for current energy level. The network outputs forward speed and angle change. The weights of the connections between nodes are represented as elements in one of two weight matrices; One matrix represents the weights between the inputs and the hidden layer, the other between hidden layer and the output nodes. Signal is propagated through the neural network by multiplying the input as a vector by the first weight matrix, processing the resultant vector element-wise at the nodes with a sigmoid function to normalize the signal and simulate realy neurons (read more about sigmoids <a href=”https://en.wikipedia.org/wiki/Sigmoid_function”>here</a>), multiplying by the second matrix, and finally applying the sigmoid function again to normalize the output. The blobs movement can thus be considered a function of several variables within the matrices. In each new agent, the coefficients of the weights recombine and mutate such that on the population scale the function that defines the blobs' movement becomes better and better. Currently, the neural network is the only one of the blob’s attributes that is genetically modified over generations.
+</p>
 
 <h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Code Structure</h3>
