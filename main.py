@@ -52,23 +52,24 @@ class PyGameView(object):
                     blob.radius
                     )
                 pygame.draw.line(
-                    self.screen, 
-                    pygame.Color('red'), 
-                    blob.int_center, 
-                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
-                    1)
-                pygame.draw.line(
                     self.screen,
-                    pygame.Color('green'),
+                    pygame.Color('red'),
                     blob.int_center,
-                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
+                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)),
                     1)
-                pygame.draw.line(
-                    self.screen,
-                    pygame.Color('green'),
-                    blob.int_center,
-                    (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
-                    1)
+                if model.draw_sight:
+                    pygame.draw.line(
+                        self.screen,
+                        pygame.Color('green'),
+                        blob.int_center,
+                        (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
+                        1)
+                    pygame.draw.line(
+                        self.screen,
+                        pygame.Color('green'),
+                        blob.int_center,
+                        (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
+                        1)
         # draw food
         for food in self.model.foods:
             pygame.draw.circle(
@@ -94,7 +95,8 @@ class Model(object):
 
         self.show_gen = True
         self.show_key = False
-
+        self.draw_sight = False
+        self.sleep_time = .005
         # create foods
         for i in range(0, FOOD_NUM):
             self.foods.append(Food())
@@ -161,16 +163,15 @@ class PyGameKeyboardController(object):
         elif event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         elif event.key == pygame.K_PERIOD:
-            global sleep
-            sleep = max(sleep-0.02, 0.0)
+            model.sleep_time = max(model.sleep_time-0.02, 0.0)
         elif event.key == pygame.K_COMMA:
-            global sleep
-            sleep += 0.02
+            model.sleep_time += 0.02
         elif event.key == pygame.K_h:
             model.show_key = not model.show_key
-
+        elif event.key == pygame.K_a:
+            model.draw_sight = not model.draw_sight
         return True
-        
+
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
@@ -184,14 +185,14 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-            else: 
+            else:
                 # handle event can end pygame loop
                 if not controller.handle_event(event):
                     running = False
         model.update()
         if model.show_gen:
             view.draw()
-            # time.sleep(sleep)
+            time.sleep(model.sleep_time)
 
     # nn = NN()
     # z1 = np.array([-1, 1])

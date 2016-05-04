@@ -7,11 +7,14 @@ import math
 
 
 class Blob(ParentSprite):
-    """ Represents a ball in my natural evolution simulation """
+    """ Represents a blob in the natural / artificial evolution simulation.
+    """
 
 
     def __init__(self, target, nn=None):
-        """ Create a ball object with the specified geometry """
+        """ Create a blob object with the specified parameters and inheritance:
+
+        """
         self.center_x = random.randint(0, SCREEN_SIZE[0])
         self.center_y = random.randint(0, SCREEN_SIZE[1])
         super(Blob, self).__init__(0, 0) #values are not needed
@@ -24,7 +27,7 @@ class Blob(ParentSprite):
         self.score_int = 0
         self.maternity_leave = 0
 
-        self.sight_angle = 10 * (np.pi / 180.) 
+        self.sight_angle = 10 * (np.pi / 180.)
         self.sight_radius = 1000
 
         self.target_blob = self
@@ -53,8 +56,8 @@ class Blob(ParentSprite):
         return self.center_y
 
     def out_of_bounds(self):
-        """ moves the blob to the other side of the screen if it moves out of 
-            bounds.  It will also make sure angle is between 0 and 2pi 
+        """ moves the blob to the other side of the screen if it moves out of
+            bounds.  It will also make sure angle is between 0 and 2pi
         """
         # #wrap around
         # if self.center_x<0:
@@ -179,7 +182,7 @@ class Blob(ParentSprite):
                     self.energy = MAX_ENERGY
 
                 del model.foods[i]
-                
+
                 model.foods.append(Food())
 
                 model.blobs.append(Blob(model.foods[0], NN([(1, self.nn)])))
@@ -225,7 +228,7 @@ class Blob(ParentSprite):
 
     def update(self, model):
         """ Update the all aspects of blob based on neural net decisions. Also
-            assign next food target.  
+            assign next food target.
 
             TODO: make the food targeting a function.
         """

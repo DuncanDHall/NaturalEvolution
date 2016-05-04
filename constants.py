@@ -1,23 +1,19 @@
 SCREEN_SIZE = (500, 500)
 FOOD_NUM = 2
 BLOB_NUM = 15
-# SIM_SKIP_NUM = 10  draw by toggling "s"
 NUM_PARENTS = 2
-
 MUTATION_RATE = 0.2
 MUTATION_AMOUNT = 0.05
-
-sleep = 0.005
+MAX_ENERGY = 1000
 
 CONTROLS = [
     "Keyboard controls:",
-    "    <space> = quit program",
-    "    d = print NN weights to console",
-    "    k = kill all (new generation created)",
-    "    s = toggle simulation drawing",
-    "    . = speed up simulation",
-    "    , = slow down simulation",
-    "    h = toggle help"
+    "    <space> = Quit program",
+    "    d = Print NN weights to console",
+    "    k = Kill all (new generation created)",
+    "    s = Toggle simulation drawing",
+    "    . = Speed up simulation",
+    "    , = Slow down simulation",
+    "    h = Toggle help",
+    "    a = Toggle sight"
 ]
-
-MAX_ENERGY = 1000
