@@ -74,15 +74,18 @@ class Blob(ParentSprite):
 
     def update_angle(self, angular_velocity):
         """ 
-        updates self.angle based on the 
-            net.
+        updates self.angle based on the angular velocity net.
+
+        Args:
+            angular_velocity (float): the angular velocity output from the
+            neural network
         """
         self.angle += angular_velocity
 
 
     def process_neural_net(self):
         """
-        use blob's neural network to determine Euclidean and angular velocity
+        use blob's neural network to determine velocity and angular velocity
 
         Returns:
             list containing distance and angle magnitudes

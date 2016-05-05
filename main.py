@@ -115,25 +115,27 @@ class Model(object):
             width (int): width of window in pixels
             height (int): height of window in pixels
         """
+        #window parameters / drawing
         self.height = height
         self.width = width
-
-        self.blobs = []
-        self.foods = []
-        self.vip_genes = []
-        self.population = 0
-
-        self.show_gen = True
-        self.show_controls = False #draw
+        self.show_gen = True #show generation number
+        self.show_controls = False #controls toggle
         self.draw_sight = False #draw sight lines
         self.sleep_time = .005 #seconds between frames
+
         # create foods
+        self.foods = []
         for i in range(0, FOOD_NUM):
             self.foods.append(Food())
 
         # create blobs
+        self.blobs = []
         for i in range(0, BLOB_NUM):
             self.blobs.append(Blob())
+
+        # population progressions
+        self.population = 0
+        self.vip_genes = []
 
 
     def update(self):
@@ -156,27 +158,31 @@ class Model(object):
 
     def create_population(self, num_winners=2):
         """ 
-        create new population of blobs based on the previous top scoring for 
-        population numbers greater than 0
+        create new population of blobs based on the top scoring blobs
+
+        Args:
+            num_winners (int): number of vip blobs to use
         """
         top_scoring = sorted(self.vip_genes, reverse=True)[:num_winners]
 
         for i in range(0, BLOB_NUM):
             new_NN = NN(parents_NN=top_scoring)
-            # TODO: Check if dna results are the blobs or others >> hmm?
             self.blobs.append(Blob(new_NN))
 
 
 
 class PyGameKeyboardController(object):
     """
-
+    Keyboard controller that responds to keyboard input
     """
 
 
     def __init__(self, model):
         """
+        Creates keyboard controller
 
+        Args:
+            model (object): contains attributes of the environment
         """
         self.model = model
 
@@ -184,6 +190,9 @@ class PyGameKeyboardController(object):
     def handle_event(self, event):
         """ 
         Look for left and right keypresses to modify the x position of the paddle 
+
+        Args:
+            event (pygame class): type of event
         """
         if event.type != KEYDOWN:
             return True

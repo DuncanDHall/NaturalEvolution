@@ -12,9 +12,10 @@ class NN(object):
 
     def __init__(self, parents_NN=None):
         """ 
-        this neural network takes in the distance and relative angle between
-        the blob and it's target food
-        parents_NN should be passed in as a tuple of NN objects
+        intializes the neural network of a blob
+
+        Args:
+            parents_NN (list): list of neural networks (classes)
         """
 
         self.inputLayerSize = 3
@@ -31,6 +32,9 @@ class NN(object):
     def get_recombine(self, parents_NN):
         """ 
         Natural evolution isn't working.  When nn is passed in from blob.eat_food, it experiences no mutation.
+
+        Args:
+            parents_NN (list): list of neural networks (classes)
         """
         new_W_list = []
 
@@ -54,7 +58,11 @@ class NN(object):
 
     def get_mutation(self):
         """
+        decides whether or not mutation occurs using using values from
+        constants
 
+        Returns:
+            the mutation amount to be added or no mutation
         """
         if np.random.rand() < MUTATION_RATE:
             return np.random.uniform(-MUTATION_AMOUNT, MUTATION_AMOUNT)
@@ -63,7 +71,14 @@ class NN(object):
 
     def process(self, z1):
         """ 
-        propigates the signal through the neural network. a3[0] refers to distance, a3[1] refers to angle
+        propigates the signal through the neural network.
+
+        Args:
+            z1 (array): array of neural network inputs
+
+        Returns:
+            list of outputs with post-processing. a3[0] refers to distance,
+            a3[1] refers to angle
         """
         # input and output to level 2 (nodes)
         z2 = z1.dot(self.W1)
@@ -77,7 +92,7 @@ class NN(object):
 
     def sigmoid(self, z):
         """ 
-
+        applies sigmoid to matrix elementwise
         """
         # -.5 allows negative values for proper angle rotations
         return ((1/(1+np.exp(-z))) - .5)

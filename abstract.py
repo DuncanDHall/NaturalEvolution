@@ -7,7 +7,8 @@ from constants import *
 
 class ParentSprite(object):
     """
-    bleghsadlfjasdl
+    Parent class for sprites that defines standard methods and attributes for
+    all sprites
     """
 
 

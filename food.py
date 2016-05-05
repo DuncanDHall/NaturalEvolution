@@ -6,7 +6,7 @@ from abstract import ParentSprite
 
 class Food(ParentSprite):
     """ 
-    Represents a piece of food in our game. 
+    Represents a piece of food in our game. Inherits from ParentSprite
     """
 
 
@@ -14,12 +14,8 @@ class Food(ParentSprite):
         """ 
         Initializes a food object to a specified center and radius. 
         """
-        border = 20
         super(Food, self).__init__()
         self.radius = random.randint(5, 10)
-        #don't use color right now.  Maybe in the future change blobs to
-        #color of food that they are tracking
-        # self.color = color
         self.eaten = False
 
 
