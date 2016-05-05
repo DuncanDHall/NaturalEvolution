@@ -9,7 +9,6 @@ from constants import *
 import os
 
 
-
 class PyGameView(object):
     """ 
     Provides a view of the environment in a pygame window 
@@ -18,7 +17,7 @@ class PyGameView(object):
 
     def __init__(self, model, size):
         """ 
-        Initialize with the specified model 
+        Initialize model
         """
         self.model = model
         self.screen = pygame.display.set_mode(size)
@@ -26,8 +25,15 @@ class PyGameView(object):
 
     def draw_text(self, text, x, y, size, color=(100, 100, 100)):
         """ 
-        helper to draw text (string input) onto screen at coords (x, y)
-        and specified font size and color
+        Helper to draw text onto screen.
+
+        Args:
+            text (string): text to display
+            x (int): horizontal position
+            y (int): vertical position
+            size (int): font size
+            color (3-tuple int): color of text.  Can use pygame colors.
+            defualt = (100, 100, 100)
         """
         basicfont = pygame.font.SysFont(None, size)
         text_render = basicfont.render(
@@ -37,16 +43,16 @@ class PyGameView(object):
 
     def draw(self):
         """ 
-        Draw the simulation to the pygame window 
+        Draw blobs, food, and text to the pygame window 
         """
         # fill background
         self.screen.fill(pygame.Color('black'))
 
-        # draw generation number
-        self.draw_text(str(self.model.generation), 1, 1, 48)
+        # draw population number
+        self.draw_text(str(self.model.population), 1, 1, 48)
 
         # draw controls helper
-        if model.show_key:
+        if model.show_controls:
             for n, line in enumerate(CONTROLS):
                 self.draw_text(line, 10, 50+14*n, 20)
         else:
@@ -68,7 +74,7 @@ class PyGameView(object):
                     blob.int_center,
                     (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)),
                     1)
-                if model.draw_sight:
+                if model.draw_sight: # sight lines are toggleable
                     pygame.draw.line(
                         self.screen,
                         pygame.Color('green'),
@@ -96,13 +102,18 @@ class PyGameView(object):
 
 class Model(object):
     """ 
-    Represents the state of all entities in the environment
+    Represents the state of all entities in the environment and drawing
+    parameters
     """
 
 
     def __init__(self, width, height):
         """
+        initialize model, environment, and default keyboard controller states
 
+        Args:
+            width (int): width of window in pixels
+            height (int): height of window in pixels
         """
         self.height = height
         self.width = width
@@ -110,12 +121,12 @@ class Model(object):
         self.blobs = []
         self.foods = []
         self.vip_genes = []
-        self.generation = 0
+        self.population = 0
 
         self.show_gen = True
-        self.show_key = False
-        self.draw_sight = False
-        self.sleep_time = .005
+        self.show_controls = False #draw
+        self.draw_sight = False #draw sight lines
+        self.sleep_time = .005 #seconds between frames
         # create foods
         for i in range(0, FOOD_NUM):
             self.foods.append(Food())
@@ -127,24 +138,26 @@ class Model(object):
 
     def update(self):
         """ 
-        Update the model state 
+        Update the model state. Each time update is called can be though of as
+        a frame 
         """
         for blob in reversed(self.blobs):
             blob.update(self)
 
         # If all blobs are dead, start new cycle
         if self.blobs == []:
-            self.create_generation(NUM_PARENTS)
+            self.create_population(NUM_PARENTS)
 
             self.vip_genes = []
-            self.generation += 1
-            if self.generation % 10 == 0:
-                print 'generation {} complete'.format(self.generation)
+            self.population += 1
+            if self.population % 10 == 0:
+                print 'population {} complete'.format(self.population)
 
 
-    def create_generation(self, num_winners=2):
+    def create_population(self, num_winners=2):
         """ 
-        Handles gene mutation and recombination
+        create new population of blobs based on the previous top scoring for 
+        population numbers greater than 0
         """
         top_scoring = sorted(self.vip_genes, reverse=True)[:num_winners]
 
@@ -163,7 +176,7 @@ class PyGameKeyboardController(object):
 
     def __init__(self, model):
         """
-        
+
         """
         self.model = model
 
@@ -195,7 +208,7 @@ class PyGameKeyboardController(object):
         elif event.key == pygame.K_COMMA:
             model.sleep_time += 0.005
         elif event.key == pygame.K_h:
-            model.show_key = not model.show_key
+            model.show_controls = not model.show_controls
         elif event.key == pygame.K_a:
             model.draw_sight = not model.draw_sight
         return True

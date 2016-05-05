@@ -6,8 +6,10 @@ import numpy as np
 import math
 
 
+
 class Blob(ParentSprite):
-    """ Represents a blob in the natural/articifial evolution simulation
+    """ 
+    Represents a blob in the natural/articifial evolution simulation
     """
 
 
@@ -45,6 +47,7 @@ class Blob(ParentSprite):
         else:
             self.nn = NN()
 
+
     def out_of_bounds(self):
         """ 
         updates self.angle so it is always between -2pi and +2pi
@@ -67,6 +70,7 @@ class Blob(ParentSprite):
         self.center_y += velocity * np.sin(self.angle)
         self.out_of_bounds()
         self.int_center = int(self.center_x), int(self.center_y)
+
 
     def update_angle(self, angular_velocity):
         """ 
@@ -185,7 +189,7 @@ class Blob(ParentSprite):
         gives a blob's score based on: self.food_eaten
 
         Returns:
-            the number of food eaten by the blob
+            the score of the blob
         """
         return self.food_eaten
 
@@ -230,25 +234,31 @@ class Blob(ParentSprite):
         else:
             self.target_food = self
 
+
     def update(self, model):
-        """ Update the all aspects of blob based on neural net decisions. Also
-            assign next food target.
-
-            TODO: make the food targeting a function.
+        """ 
+        Update the blob by calling helper functions.
         """
-
+        # get current velocity and angular velocity based on neural network
         [velocity, angular_velocity] = self.process_neural_net()
-
+        
+        # use velocity and angular_velocity to update self.angle, 
+        # self.center_x, self.center_y, and self.energy
         self.update_angle(angular_velocity)
 
         self.update_position(velocity)
 
         self.update_energy(model, velocity, angular_velocity)
 
+        # update color of blob
         self.update_color()
 
+        # interact with food objects
         self.eat_food(model)
 
+        # re-assign targets
         self.target_closest_blob(self.get_things_within_sight(model.blobs))
 
         self.target_closest_food(self.get_things_within_sight(model.foods))
+
+

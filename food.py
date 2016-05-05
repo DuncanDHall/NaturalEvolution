@@ -2,10 +2,18 @@ import random
 from constants import *
 from abstract import ParentSprite
 
+
+
 class Food(ParentSprite):
-    """ Represents a piece of food in our game. """
+    """ 
+    Represents a piece of food in our game. 
+    """
+
+
     def __init__(self):
-        """ Initializes a food object to a specified center and radius. """
+        """ 
+        Initializes a food object to a specified center and radius. 
+        """
         border = 20
         super(Food, self).__init__()
         self.radius = random.randint(5, 10)
@@ -13,3 +21,5 @@ class Food(ParentSprite):
         #color of food that they are tracking
         # self.color = color
         self.eaten = False
+
+
