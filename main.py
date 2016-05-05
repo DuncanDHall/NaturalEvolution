@@ -10,32 +10,49 @@ import os
 
 
 class PyGameView(object):
-    """ Provides a view of the environment in a pygame
-        window """
+    """ 
+    Provides a view of the environment in a pygame window 
+    """
+
+
     def __init__(self, model, size):
-        """ Initialize with the specified model """
+        """ 
+        Initialize model
+        """
         self.model = model
         self.screen = pygame.display.set_mode(size)
 
+
     def draw_text(self, text, x, y, size, color=(100, 100, 100)):
-        """ helper to draw text (string input) onto screen at coords (x, y)
-            and specified font size and color
+        """ 
+        Helper to draw text onto screen.
+
+        Args:
+            text (string): text to display
+            x (int): horizontal position
+            y (int): vertical position
+            size (int): font size
+            color (3-tuple int): color of text.  Can use pygame colors.
+            defualt = (100, 100, 100)
         """
         basicfont = pygame.font.SysFont(None, size)
         text_render = basicfont.render(
             text, True, color)
         self.screen.blit(text_render, (x, y))
 
+
     def draw(self):
-        """ Draw the simulation to the pygame window """
+        """ 
+        Draw blobs, food, and text to the pygame window 
+        """
         # fill background
         self.screen.fill(pygame.Color('black'))
 
-        # draw generation number
-        self.draw_text(str(self.model.generation), 1, 1, 48)
+        # draw population number
+        self.draw_text(str(self.model.population), 1, 1, 48)
 
         # draw controls helper
-        if model.show_key:
+        if model.show_controls:
             for n, line in enumerate(CONTROLS):
                 self.draw_text(line, 10, 50+14*n, 20)
         else:
@@ -52,11 +69,24 @@ class PyGameView(object):
                     blob.radius
                     )
                 pygame.draw.line(
-                    self.screen, 
-                    pygame.Color('red'), 
-                    blob.int_center, 
-                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)), 
+                    self.screen,
+                    pygame.Color('red'),
+                    blob.int_center,
+                    (int(blob.center_x + 20*np.cos(blob.angle)), int(blob.center_y) + 20*np.sin(blob.angle)),
                     1)
+                if model.draw_sight: # sight lines are toggleable
+                    pygame.draw.line(
+                        self.screen,
+                        pygame.Color('green'),
+                        blob.int_center,
+                        (int(blob.center_x + blob.sight_radius*np.cos(blob.angle-blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle - blob.sight_angle)),
+                        1)
+                    pygame.draw.line(
+                        self.screen,
+                        pygame.Color('green'),
+                        blob.int_center,
+                        (int(blob.center_x + blob.sight_radius*np.cos(blob.angle+blob.sight_angle)), int(blob.center_y) + blob.sight_radius*np.sin(blob.angle + blob.sight_angle)),
+                        1)
         # draw food
         for food in self.model.foods:
             pygame.draw.circle(
@@ -69,66 +99,101 @@ class PyGameView(object):
         pygame.display.update()
 
 
+
 class Model(object):
-    """ Represents the state of all entities in the environment"""
+    """ 
+    Represents the state of all entities in the environment and drawing
+    parameters
+    """
+
+
     def __init__(self, width, height):
+        """
+        initialize model, environment, and default keyboard controller states
+
+        Args:
+            width (int): width of window in pixels
+            height (int): height of window in pixels
+        """
+        #window parameters / drawing
         self.height = height
         self.width = width
-
-        self.blobs = []
-        self.foods = []
-        self.vip_genes = []
-        self.generation = 0
-
-        self.show_gen = True
-        self.show_key = False
+        self.show_gen = True #show generation number
+        self.show_controls = False #controls toggle
+        self.draw_sight = False #draw sight lines
+        self.sleep_time = .005 #seconds between frames
 
         # create foods
+        self.foods = []
         for i in range(0, FOOD_NUM):
             self.foods.append(Food())
 
         # create blobs
+        self.blobs = []
         for i in range(0, BLOB_NUM):
-            self.blobs.append(Blob(self.foods[0]))
+            self.blobs.append(Blob())
+
+        # population progressions
+        self.population = 0
+        self.vip_genes = []
+
 
     def update(self):
-        """ Update the model state """
-        for i in range(len(self.blobs)-1, 0, -1):
-            for j in range(i-1, -1, -1):
-                one = self.blobs[i]
-                two = self.blobs[j]
-                if one.intersect(two):
-                    one.interact(two, self)
-
+        """ 
+        Update the model state. Each time update is called can be though of as
+        a frame 
+        """
         for blob in reversed(self.blobs):
             blob.update(self)
 
         # If all blobs are dead, start new cycle
         if self.blobs == []:
-            self.create_generation(NUM_PARENTS)
+            self.create_population(NUM_PARENTS)
 
             self.vip_genes = []
-            self.generation += 1
-            if self.generation % 10 == 0:
-                print 'generation {} complete'.format(self.generation)
+            self.population += 1
+            if self.population % 10 == 0:
+                print 'population {} complete'.format(self.population)
 
-    def create_generation(self, num_winners=2):
-        """ Handles gene mutation and recombination"""
+
+    def create_population(self, num_winners=2):
+        """ 
+        create new population of blobs based on the top scoring blobs
+
+        Args:
+            num_winners (int): number of vip blobs to use
+        """
         top_scoring = sorted(self.vip_genes, reverse=True)[:num_winners]
 
         for i in range(0, BLOB_NUM):
             new_NN = NN(parents_NN=top_scoring)
-            # TODO: Check if dna results are the blobs or others >> hmm?
-            self.blobs.append(Blob(self.foods[0], new_NN))
+            self.blobs.append(Blob(new_NN))
+
 
 
 class PyGameKeyboardController(object):
+    """
+    Keyboard controller that responds to keyboard input
+    """
+
+
     def __init__(self, model):
+        """
+        Creates keyboard controller
+
+        Args:
+            model (object): contains attributes of the environment
+        """
         self.model = model
 
+
     def handle_event(self, event):
-        """ Look for left and right keypresses to
-            modify the x position of the paddle """
+        """ 
+        Look for left and right keypresses to modify the x position of the paddle 
+
+        Args:
+            event (pygame class): type of event
+        """
         if event.type != KEYDOWN:
             return True
         elif event.key == pygame.K_SPACE:
@@ -142,23 +207,23 @@ class PyGameKeyboardController(object):
                 print ""
                 print blob.nn.W2
                 # break #iterate through first thing in a list
-
         elif event.key == pygame.K_k:
             for blob in model.blobs:
                 blob.energy = 0
         elif event.key == pygame.K_s:
             model.show_gen = not model.show_gen
         elif event.key == pygame.K_PERIOD:
-            global sleep
-            sleep = max(sleep-0.02, 0.0)
+            model.sleep_time = max(model.sleep_time-0.005, 0.0)
         elif event.key == pygame.K_COMMA:
-            global sleep
-            sleep += 0.02
+            model.sleep_time += 0.005
         elif event.key == pygame.K_h:
-            model.show_key = not model.show_key
-
+            model.show_controls = not model.show_controls
+        elif event.key == pygame.K_a:
+            model.draw_sight = not model.draw_sight
         return True
-        
+
+
+
 if __name__ == '__main__':
     pygame.init()
     size = SCREEN_SIZE
@@ -179,8 +244,4 @@ if __name__ == '__main__':
         model.update()
         if model.show_gen:
             view.draw()
-            time.sleep(sleep)
-
-    # nn = NN()
-    # z1 = np.array([-1, 1])
-    # print nn.process(z1)
+            time.sleep(model.sleep_time)
