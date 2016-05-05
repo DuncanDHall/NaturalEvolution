@@ -39,7 +39,7 @@ We began by trying to implement a genetic algorithm that selects for the best bl
 <p>
 Another improvement we made was to add a field of vision to each blob. Previously, each blob was aware of where every single food was, regardless of distance and line of sight. This was obviously not realistic, so we changed each blob to only spot food within a specific angle and radius. This resulted in interesting behavior: the blobs started spinning more, which is in fact the best way to maximize ground covered. 
 </p>
-<img src="images/field_of_vision.png" alt="Field of Vision”/>
+<img src="images/field_of_vision.png" alt="Field of Vision"/>
 <p>
 The final milestone in our project was implementing natural selection over artificial selection. We’ve transitioned to allowing blobs to detect both food and other blobs, though currently they only learn to ignore each other and go for the food, regardless of how many generations we run. To try to stimulate some kind of social interaction between blobs, we’ve made blobs reproduce when they intersect, though the neural networks and current sensory input seems to not allow the development of behavior around this. Instead, the reproduction either over-populates the screen with blobs, or is too heavy of a culling force depending on the energy cost of the reproduction.
 </p>
