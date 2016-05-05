@@ -31,42 +31,50 @@
       <h3>
 <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Description</h3>
 
-<p> Our project Natural Evolution is a simulation of a natural selection and speciation, using genetic algorithms and neural networks. It shows the evolution of organisms that seek to eat food and reproduce "at will". 
-The simulation is run in Pygame, and the organisms make decisions using neural networks. As the generations progress further, the organisms begin to exhibit interesting behavior. </p>
+<p> 
+Our project Natural Evolution is a simulation which achieves natural selection using genetic algorithms and neural networks. It shows the evolution of a population as it gets better at seeking food through mutation and selection. The simulation is run in Pygame, and the organisms make decisions using neural networks. As the generations progress further, the organisms begin to exhibit interesting behavior. 
+</p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>User Instructions</h3>
+<h3><a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>User Instructions</h3>
 
-<p><b>Our game has the following dependencies: </b><br>
-Python 2.7 <br>
-Pygame 1.9.1 – <a href=”http://www.pygame.org/download.shtml”>get it</a> <br>
-Numpy 1.10.4 – <a href="http://www.scipy.org/scipylib/download.html">get it</a> <br> <br>
-<b>To install our simulation game, run the following command in terminal:</b>
-<div class=”boxed”>$ git clone https://github.com/DuncanDHall/NaturalEvolution.git<br>
-$ python main.py</div><br>
-At this point, a PyGame window should appear displaying 15 white "blobs" and several orange "foods", which begin interacting. <br><br><b>Use the following keyboard controls: </b><br>
-space = quit program<br>
-D = print NN weights to console<br>
-K = kill all (new generation created)<br>
-S = toggle simulation drawing<br>
-. = speed up simulation<br>
-, = slow down simulation<br>
-H = toggle help
+<p><b>The simulation has the following dependencies: </b></p>
+<ul>
+<li>Python 2.7 </li>
+<li>Pygame 1.9.1 – <a href="http://www.pygame.org/download.shtml">get it</a> </li>
+<li>Numpy 1.10.4 – <a href="http://www.scipy.org/scipylib/download.html">get it</a></li>
+</ul>
+<p><b>To install our simulation game, run the following command in terminal:</b></p>
+<div class="boxed">
+$ git clone https://github.com/DuncanDHall/NaturalEvolution.git<br>
+$ python main.py
+</div>
+<p>At this point, a PyGame window should appear displaying 15 white "blobs" and several orange "foods", which begin interacting.</p>
+<p><b>Use the following keyboard controls: </b><br>
+<ul>
+<li>space = quit program</li>
+<li>D = print NN weights to console</li>
+<li>K = kill all (new generation created)</li>
+<li>S = toggle simulation drawing</li>
+<li>. = speed up simulation</li>
+<li>, = slow down simulation</li>
+<li>H = toggle help</li>
 </p>
 
 <h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Results</h3>
 
 <p>
-In this first video, the blobs are shown at a late stage of evolution. They are already fairly efficient at spotting and reaching food. Until a blob spots a food within its line of sight, it tends to spin with a small radius. This is logically the most efficient way to “cover ground.” When a blob spots food, it moves directly to it at an even rate. <br> <br>
-<iframe width="700" height="525" src="https://www.youtube.com/embed/_UbF70yXRt4" frameborder="0" allowfullscreen></iframe> <br> <br>
-The second video is similar to the first one, except we display blobs’ lines of sight. This should make their food seeking behavior more apparent. Also note that as blobs start to run out of energy, they decrease their speed in order to save energy. <br> <br>
-
-<iframe width="700" height="525" src="https://www.youtube.com/embed/Qd1_a59mjmc" frameborder="0" allowfullscreen></iframe> <br> <br>
+In this first video, the blobs are shown at a late stage of evolution. They are already fairly efficient at spotting and reaching food. Until a blob spots a food within its line of sight, it tends to spin with a small radius. This is logically the most efficient way to “cover ground.” When a blob spots food, it moves directly to it at an even rate.</p>
+<iframe width="700" height="525" src="https://www.youtube.com/embed/_UbF70yXRt4" frameborder="0" allowfullscreen></iframe>
+<p>
+The second video is similar to the first one, except we display blobs’ lines of sight. This should make their food seeking behavior more apparent. Also note that as blobs start to run out of energy, they decrease their speed in order to save energy.</p>
+<p>
+<iframe width="700" height="525" src="https://www.youtube.com/embed/Qd1_a59mjmc" frameborder="0" allowfullscreen></iframe> </p>
+<p>
 It’s extraordinary that merely three inputs are able to produce such complex behavior using neural networks. This is explained in our implementation page. </p>
 <h3>
 <a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Evolution</h3>
-<br> We began this project by trying to implement a genetic algorithm that selects for the best blobs artificially. We came up with different scoring and mutation mechanisms to achieve the behavior of a genetic algorithm. We took the two most fit blobs of each generation and averaged their features while randomizing it to a certain percentage. The final milestone in our project was implementing natural selection over artificial selection. We began to implement behaviors that allowed the blobs to determine when to reproduce, without waiting for a new generation to begin. We are still working on creating a structure that could facilitate a fully independent population.</p>
+<p>We began this project by trying to implement a genetic algorithm that selects for the best blobs artificially. We came up with different scoring and mutation mechanisms to achieve the behavior of a genetic algorithm. We took the two most fit blobs of each generation and averaged their features while randomizing it to a certain percentage. The final milestone in our project was implementing natural selection over artificial selection. We began to implement behaviors that allowed the blobs to determine when to reproduce, without waiting for a new generation to begin. We are still working on creating a structure that could facilitate a fully independent population.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/DuncanDHall/NaturalEvolution">Natural Evolution</a> is maintained by <a href="https://github.com/DuncanDHall">DuncanDHall</a>.</span>
